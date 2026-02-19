@@ -1,4 +1,4 @@
-import { DayMovementsForm } from "@/features/dayMovements/DayMovementsForm";
+import { DayMovementsForm } from "./features/dayMovements/DayMovementsForm.tsx";
 import {
   ActionIcon,
   AppShell,

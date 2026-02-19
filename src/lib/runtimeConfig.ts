@@ -19,12 +19,12 @@ declare global {
  * environment variables without rebuilding the image.
  */
 export function getApiBaseUrl(): string {
-  const runtimeApiUrl = window.__APP_CONFIG__?.API_BASE_URL;
+  const runtimeApiUrl = globalThis.__APP_CONFIG__?.API_BASE_URL;
   if (runtimeApiUrl && runtimeApiUrl.trim() !== "") {
     return runtimeApiUrl.trim().replace(/\/+$/, "");
   }
 
-  const runtimeLegacyUrl = window.__APP_CONFIG__?.VITE_API_BASE_URL;
+  const runtimeLegacyUrl = globalThis.__APP_CONFIG__?.VITE_API_BASE_URL;
   if (runtimeLegacyUrl && runtimeLegacyUrl.trim() !== "") {
     return runtimeLegacyUrl.trim().replace(/\/+$/, "");
   }

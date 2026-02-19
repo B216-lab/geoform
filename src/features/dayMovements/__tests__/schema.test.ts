@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { dayMovementsSchema, type DayMovementsFormValues } from "../schema";
+import { dayMovementsSchema, type DayMovementsFormValues } from "../schema.ts";
 
 function validFormData(): DayMovementsFormValues {
   return {

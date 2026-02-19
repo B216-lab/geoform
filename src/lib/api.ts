@@ -1,4 +1,4 @@
-import { getApiBaseUrl } from "./runtimeConfig";
+import { getApiBaseUrl } from "./runtimeConfig.ts";
 
 /**
  * Network-level error (server unreachable, timeout, etc.).

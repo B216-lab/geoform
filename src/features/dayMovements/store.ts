@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { normalizeDraft, type DayMovementsFormValues } from "./schema";
+import { normalizeDraft, type DayMovementsFormValues } from "./schema.ts";
 
 const STORAGE_KEY = "form";
 
@@ -28,7 +28,7 @@ interface DraftState {
 
 function getStorage(): Storage | null {
   try {
-    return typeof window !== "undefined" ? window.localStorage : null;
+    return typeof window !== "undefined" ? globalThis.localStorage : null;
   } catch {
     return null;
   }

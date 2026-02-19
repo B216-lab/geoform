@@ -23,10 +23,10 @@ import {
 } from "@mantine/core";
 import { TimePicker } from "@mantine/dates";
 import { IconClockHour3, IconMapPin } from "@tabler/icons-react";
-import { AddressAutocomplete } from "@/components/ui/AddressAutocomplete";
-import { ArrivalPointItem } from "./ArrivalPointItem";
-import { MovementItem } from "./MovementItem";
-import { SuccessScreen } from "@/components/SuccessScreen";
+import { AddressAutocomplete } from "../../components/ui/AddressAutocomplete.tsx";
+import { ArrivalPointItem } from "./ArrivalPointItem.tsx";
+import { MovementItem } from "./MovementItem.tsx";
+import { SuccessScreen } from "../../components/SuccessScreen.tsx";
 import {
   buildNextMovementFromPrevious,
   chainMovements,
@@ -37,13 +37,13 @@ import {
   movementSchema,
   type DayMovementsFormValues,
   type MovementValues,
-} from "./schema";
-import { enumToOptions, Gender, Place, SocialStatus } from "./enums";
-import { useDaDataAddress } from "./useDaDataAddress";
-import { submitDayMovementsForm } from "./formSubmission";
-import { useDraftStore } from "./store";
-import { ApiHttpError, ApiNetworkError } from "@/lib/api";
-import type { DaDataAddressSuggestion } from "./addressUtils";
+} from "./schema.ts";
+import { enumToOptions, Gender, Place, SocialStatus } from "./enums.ts";
+import { useDaDataAddress } from "./useDaDataAddress.ts";
+import { submitDayMovementsForm } from "./formSubmission.ts";
+import { useDraftStore } from "./store.ts";
+import { ApiHttpError, ApiNetworkError } from "../../lib/api.ts";
+import type { DaDataAddressSuggestion } from "./addressUtils.ts";
 
 const genderOptions = enumToOptions(Gender);
 const socialStatusOptions = enumToOptions(SocialStatus);

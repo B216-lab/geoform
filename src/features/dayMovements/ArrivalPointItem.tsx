@@ -3,10 +3,10 @@ import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { Card, Grid, NumberInput, Select, Stack, Text, Textarea } from "@mantine/core";
 import { TimePicker } from "@mantine/dates";
 import { IconClockHour3 } from "@tabler/icons-react";
-import { AddressAutocomplete } from "@/components/ui/AddressAutocomplete";
-import { enumToOptions, Place } from "./enums";
-import type { DaDataAddressSuggestion } from "./addressUtils";
-import type { DayMovementsFormValues } from "./schema";
+import { AddressAutocomplete } from "../../components/ui/AddressAutocomplete.tsx";
+import { enumToOptions, Place } from "./enums.ts";
+import type { DaDataAddressSuggestion } from "./addressUtils.ts";
+import type { DayMovementsFormValues } from "./schema.ts";
 
 interface ArrivalPointItemProps {
   index: number;

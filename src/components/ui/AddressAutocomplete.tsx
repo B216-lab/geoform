@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Autocomplete, Loader } from "@mantine/core";
-import type { DaDataAddressSuggestion } from "@/features/dayMovements/addressUtils";
+import type { DaDataAddressSuggestion } from "../../features/dayMovements/addressUtils.ts";
 
 interface AddressAutocompleteProps {
   value: DaDataAddressSuggestion | null;

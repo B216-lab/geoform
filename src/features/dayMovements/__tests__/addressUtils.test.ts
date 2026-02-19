@@ -3,7 +3,7 @@ import {
   simplifyAddress,
   validateAddressHasHouse,
   type DaDataAddressSuggestion,
-} from "../addressUtils";
+} from "../addressUtils.ts";
 
 describe("simplifyAddress", () => {
   it("returns null for null input", () => {

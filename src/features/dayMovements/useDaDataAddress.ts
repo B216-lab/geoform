@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react";
-import { fetchDaDataSuggestionsAddress } from "./dadataApi";
-import type { DaDataAddressSuggestion } from "./addressUtils";
+import { fetchDaDataSuggestionsAddress } from "./dadataApi.ts";
+import type { DaDataAddressSuggestion } from "./addressUtils.ts";
 
 const DEFAULT_ADDRESS_DELAY = 1000;
 const DEFAULT_MIN_CHARS = 3;

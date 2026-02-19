@@ -1,6 +1,6 @@
-import { getApiBaseUrl } from "@/lib/runtimeConfig";
-import { ApiHttpError, ApiNetworkError } from "@/lib/api";
-import type { DayMovementsFormValues } from "./schema";
+import { getApiBaseUrl } from "../../lib/runtimeConfig.ts";
+import { ApiHttpError, ApiNetworkError } from "../../lib/api.ts";
+import type { DayMovementsFormValues } from "./schema.ts";
 
 /**
  * Submits the DayMovements form data as JSON to the public endpoint.

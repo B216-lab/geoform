@@ -32,4 +32,8 @@ RUN chmod +x /docker-entrypoint.d/10-env.sh
 
 EXPOSE 4173
 
+# todo change to rootless user
+# todo add healthcheck
+
+
 CMD ["sh", "-c", "/docker-entrypoint.d/10-env.sh && nginx -g 'daemon off;'"]

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { useDraftStore } from "../store";
-import type { DayMovementsFormValues, MovementValues } from "../schema";
+import { useDraftStore } from "../store.ts";
+import type { DayMovementsFormValues, MovementValues } from "../schema.ts";
 
 // Provide a proper localStorage mock for testing
 const localStorageMock = (() => {
