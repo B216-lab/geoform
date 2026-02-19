@@ -3,7 +3,6 @@
     "dev": "pnpm run dev",
     "build": "pnpm run build",
     "preview": "pnpm run preview",
-    "lint": "pnpm run lint",
     "test": "pnpm run test",
     "test:watch": "pnpm run test:watch",
     "install": "pnpm install"

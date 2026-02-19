@@ -14,8 +14,8 @@ import {
   MultiSelect,
 } from "@mantine/core";
 import { IconBus, IconWalk } from "@tabler/icons-react";
-import { enumToOptions, TypeMovement, Transport } from "./enums";
-import type { DayMovementsFormValues } from "./schema";
+import { enumToOptions, TypeMovement, Transport } from "./enums.ts";
+import type { DayMovementsFormValues } from "./schema.ts";
 
 interface MovementItemProps {
   index: number;

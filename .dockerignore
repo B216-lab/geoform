@@ -1,3 +1,11 @@
+node_modules
+.pnpm-store
+dist
+.git
+.gitignore
+.cursor
+coverage
+*.log
 .git
 .github
 **/node_modules

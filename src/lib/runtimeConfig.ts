@@ -3,6 +3,7 @@
  * Populated from env.js generated at container startup.
  */
 interface AppConfig {
+  API_BASE_URL?: string;
   VITE_API_BASE_URL?: string;
 }
 
@@ -18,9 +19,14 @@ declare global {
  * environment variables without rebuilding the image.
  */
 export function getApiBaseUrl(): string {
-  const runtimeUrl = window.__APP_CONFIG__?.VITE_API_BASE_URL;
-  if (runtimeUrl && runtimeUrl.trim() !== "") {
-    return runtimeUrl.trim().replace(/\/+$/, "");
+  const runtimeApiUrl = window.__APP_CONFIG__?.API_BASE_URL;
+  if (runtimeApiUrl && runtimeApiUrl.trim() !== "") {
+    return runtimeApiUrl.trim().replace(/\/+$/, "");
+  }
+
+  const runtimeLegacyUrl = window.__APP_CONFIG__?.VITE_API_BASE_URL;
+  if (runtimeLegacyUrl && runtimeLegacyUrl.trim() !== "") {
+    return runtimeLegacyUrl.trim().replace(/\/+$/, "");
   }
 
   const buildTimeUrl =
