@@ -1,10 +1,26 @@
-FROM node:25-bullseye-slim AS builder
+# syntax=docker/dockerfile:1.7
+
+FROM node:25-bullseye-slim AS base
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 
 WORKDIR /app
 
+RUN npm install --global corepack && corepack enable
+
 COPY package.json pnpm-lock.yaml* ./
 
-RUN npm install -g pnpm@10.25.0 && \
+FROM base AS prod-deps
+
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    corepack install && \
+    pnpm install --prod --frozen-lockfile
+
+FROM base AS build
+
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    corepack install && \
     pnpm install --frozen-lockfile
 
 COPY . .
@@ -19,11 +35,11 @@ ENV VITE_API_BASE_URL=$VITE_API_BASE_URL \
 
 RUN pnpm run build
 
-FROM nginx:stable-alpine3.23-slim
+FROM nginx:stable-alpine3.23-slim AS runtime
 
 RUN apk add --no-cache gettext
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY env.template.js /usr/share/nginx/html/env.template.js

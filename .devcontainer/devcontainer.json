@@ -5,11 +5,8 @@
     "ghcr.io/devcontainers/features/node:1": {
       "version": "25"
     },
-    "ghcr.io/devcontainers/features/deno:1": {
-      "version": "latest"
-    },
-    "ghcr.io/devcontainers/features/git:1": {
-      "version": "latest"
+    "ghcr.io/devcontainers-community/features/deno:1": {
+      "version": "2.6.5"
     }
   },
   "forwardPorts": [
@@ -30,19 +27,18 @@
     "NODE_ENV": "development",
     "CHOKIDAR_USEPOLLING": "true",
     "COREPACK_ENABLE_STRICT": "0",
-    "TMPDIR": "/tmp"
+    "TMPDIR": "/tmp",
+    "PNPM_HOME": "/home/vscode/.local/share/pnpm/store"
   },
   "mounts": [
     "source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
   ],
-  "postAttachCommand": "pnpm install --frozen-lockfile",
+  "postAttachCommand": "sudo chown vscode:vscode node_modules && pnpm install --frozen-lockfile && pnpm run prepare",
   "remoteUser": "vscode",
   "customizations": {
     "vscode": {
       "extensions": [
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "bradlc.vscode-tailwindcss"
+        "denoland.vscode-deno"
       ],
       "settings": {
         "editor.formatOnSave": true

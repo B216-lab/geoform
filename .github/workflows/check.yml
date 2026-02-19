@@ -9,7 +9,6 @@ on:
 
 env:
   NODE_VERSION: "25.2.1"
-  PNPM_VERSION: "10.25.0"
   DENO_VERSION: "v2.x"
   DENO_DIR: ~/.cache/deno
 
@@ -25,17 +24,17 @@ jobs:
         with:
           deno-version: ${{ env.DENO_VERSION }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+
+      - name: Setup Corepack and pnpm
+        run: |
+          npm install --global corepack
+          corepack enable
+          corepack install
 
       - name: Cache Deno dependencies
         uses: actions/cache@v4
@@ -67,17 +66,17 @@ jobs:
         with:
           deno-version: ${{ env.DENO_VERSION }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+
+      - name: Setup Corepack and pnpm
+        run: |
+          npm install --global corepack
+          corepack enable
+          corepack install
 
       - name: Download dependencies artifact
         uses: actions/download-artifact@v4
@@ -100,17 +99,17 @@ jobs:
         with:
           deno-version: ${{ env.DENO_VERSION }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+
+      - name: Setup Corepack and pnpm
+        run: |
+          npm install --global corepack
+          corepack enable
+          corepack install
 
       - name: Download dependencies artifact
         uses: actions/download-artifact@v4
@@ -133,17 +132,17 @@ jobs:
         with:
           deno-version: ${{ env.DENO_VERSION }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+
+      - name: Setup Corepack and pnpm
+        run: |
+          npm install --global corepack
+          corepack enable
+          corepack install
 
       - name: Download dependencies artifact
         uses: actions/download-artifact@v4
