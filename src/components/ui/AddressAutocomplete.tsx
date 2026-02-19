@@ -31,9 +31,14 @@ export function AddressAutocomplete({
   const [suggestions, setSuggestions] = useState<DaDataAddressSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const skipNextNullSyncRef = useRef(false);
 
   // Sync display text when value changes externally
   useEffect(() => {
+    if (value === null && skipNextNullSyncRef.current) {
+      skipNextNullSyncRef.current = false;
+      return;
+    }
     setQuery(value?.value ?? "");
   }, [value]);
 
@@ -64,6 +69,8 @@ export function AddressAutocomplete({
     setQuery(text);
     // If user edits text after selecting, clear the structured value
     if (value && text !== value.value) {
+      // Avoid wiping typed text when parent echoes value=null back.
+      skipNextNullSyncRef.current = true;
       onChange(null);
     }
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -85,6 +92,7 @@ export function AddressAutocomplete({
       placeholder={placeholder}
       onChange={handleInputChange}
       data={suggestions.map((s) => s.value)}
+      filter={({ options }) => options}
       autoComplete="off"
       rightSection={isLoading ? <Loader size={14} /> : null}
       onOptionSubmit={(selectedValue) => {

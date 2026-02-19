@@ -85,11 +85,12 @@ describe("useDraftStore", () => {
     const state = useDraftStore.getState();
     expect(state.draft.movements).toBeUndefined();
 
-    // Check that the last setItem call excluded movements
+    // Check that persisted draft is normalized to a single default movement.
     const lastSetCall = localStorageMock.setItem.mock.calls.at(-1);
     expect(lastSetCall).toBeTruthy();
     const stored = JSON.parse(lastSetCall![1] as string);
-    expect(stored.movements).toBeUndefined();
+    expect(Array.isArray(stored.movements)).toBe(true);
+    expect(stored.movements).toHaveLength(1);
   });
 
   it("markRestored sets isRestored to true", () => {

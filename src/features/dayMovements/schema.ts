@@ -19,6 +19,25 @@ function hasHouseNumber(val: DaDataAddressValue | null | undefined): boolean {
   return !!val.data.house;
 }
 
+function isSameAddress(
+  left: DaDataAddressValue | null | undefined,
+  right: DaDataAddressValue | null | undefined,
+): boolean {
+  if (!left || !right) return false;
+
+  const leftLat = String(left.data?.geo_lat ?? "");
+  const leftLon = String(left.data?.geo_lon ?? "");
+  const rightLat = String(right.data?.geo_lat ?? "");
+  const rightLon = String(right.data?.geo_lon ?? "");
+  if (leftLat && leftLon && rightLat && rightLon) {
+    return leftLat === rightLat && leftLon === rightLon;
+  }
+
+  const leftValue = left.value.trim().toLowerCase();
+  const rightValue = right.value.trim().toLowerCase();
+  return !!leftValue && leftValue === rightValue;
+}
+
 const addressWithHouseSchema = daDataAddressSchema.refine(hasHouseNumber, {
   message: "Адрес должен содержать номер дома",
 });
@@ -99,6 +118,24 @@ export const movementSchema = z
         });
       }
     }
+
+    // Prevent zero-distance movement: home -> home or same address twice in a row.
+    const sameHome =
+      data.departurePlace === "HOME_RESIDENCE" &&
+      data.arrivalPlace === "HOME_RESIDENCE";
+    const sameAddressPoint = isSameAddress(
+      data.departureAddress,
+      data.arrivalAddress,
+    );
+
+    if (sameHome || sameAddressPoint) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Пункт отправления и пункт прибытия не могут быть одинаковыми для одного передвижения",
+        path: ["arrivalPlace"],
+      });
+    }
   });
 
 /**
@@ -125,6 +162,12 @@ export const dayMovementsSchema = z.object({
 
 export type DayMovementsFormValues = z.infer<typeof dayMovementsSchema>;
 export type MovementValues = z.infer<typeof movementSchema>;
+
+export interface TimelineStartPoint {
+  departureTime: string;
+  departurePlace: string;
+  departureAddress: DaDataAddressValue | null;
+}
 
 /**
  * Default values for a new empty movement entry.
@@ -158,3 +201,83 @@ export const defaultFormValues: Partial<DayMovementsFormValues> = {
   movementsDate: "",
   movements: [{ ...defaultMovement } as MovementValues],
 };
+
+/**
+ * Extracts start point values from the first movement.
+ */
+export function getTimelineStartPoint(
+  movements: MovementValues[] | undefined,
+): TimelineStartPoint {
+  const first = movements?.[0];
+  return {
+    departureTime: first?.departureTime ?? "",
+    departurePlace: first?.departurePlace ?? "",
+    departureAddress: first?.departureAddress ?? null,
+  };
+}
+
+/**
+ * Creates a new movement linked from a previous arrival point.
+ */
+export function buildNextMovementFromPrevious(
+  previous: MovementValues,
+): MovementValues {
+  return {
+    ...(defaultMovement as MovementValues),
+    departureTime: previous.arrivalTime ?? "",
+    departurePlace: previous.arrivalPlace ?? "",
+    departureAddress: previous.arrivalAddress ?? null,
+  };
+}
+
+/**
+ * Ensures departure fields are linearly chained:
+ * movement[i].departure = movement[i - 1].arrival for i > 0.
+ */
+export function chainMovements(
+  movements: MovementValues[] | undefined,
+): MovementValues[] {
+  if (!movements || movements.length === 0) {
+    return [{ ...defaultMovement } as MovementValues];
+  }
+
+  const next = movements.map((m) => ({ ...m })) as MovementValues[];
+  for (let i = 1; i < next.length; i++) {
+    const prev = next[i - 1];
+    const current = next[i];
+    if (!prev || !current) continue;
+    current.departurePlace = prev.arrivalPlace ?? "";
+    current.departureAddress = prev.arrivalAddress ?? null;
+  }
+  return next;
+}
+
+/**
+ * Best-effort migration/normalization for drafts loaded from localStorage.
+ */
+export function normalizeDraft(
+  draft: Partial<DayMovementsFormValues>,
+): Partial<DayMovementsFormValues> {
+  const normalized = { ...draft };
+  if (!normalized.movements || normalized.movements.length === 0) {
+    normalized.movements = [{ ...defaultMovement } as MovementValues];
+    return normalized;
+  }
+
+  normalized.movements = chainMovements(
+    normalized.movements as MovementValues[],
+  );
+  return normalized;
+}
+
+/**
+ * Maps timeline-edited form data to payload with guaranteed movement chaining.
+ */
+export function mapTimelineFormToPayload(
+  data: DayMovementsFormValues,
+): DayMovementsFormValues {
+  return {
+    ...data,
+    movements: chainMovements(data.movements as MovementValues[]),
+  };
+}

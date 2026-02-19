@@ -14,6 +14,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
     "@mantine/core": "^8.3.15",
+    "@mantine/dates": "^8.3.15",
     "@mantine/hooks": "^8.3.15",
     "@tabler/icons-react": "^3.36.1",
     "axios": "^1.9.0",

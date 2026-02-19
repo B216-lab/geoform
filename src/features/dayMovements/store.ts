@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { DayMovementsFormValues } from "./schema";
+import { normalizeDraft, type DayMovementsFormValues } from "./schema";
 
 const STORAGE_KEY = "form";
 
@@ -38,7 +38,7 @@ function readFromStorage(): Partial<DayMovementsFormValues> {
   try {
     const raw = getStorage()?.getItem(STORAGE_KEY);
     if (!raw) return {};
-    return JSON.parse(raw) as Partial<DayMovementsFormValues>;
+    return normalizeDraft(JSON.parse(raw) as Partial<DayMovementsFormValues>);
   } catch {
     return {};
   }
@@ -46,7 +46,7 @@ function readFromStorage(): Partial<DayMovementsFormValues> {
 
 function writeToStorage(data: Partial<DayMovementsFormValues>): void {
   try {
-    getStorage()?.setItem(STORAGE_KEY, JSON.stringify(data));
+    getStorage()?.setItem(STORAGE_KEY, JSON.stringify(normalizeDraft(data)));
   } catch {
     // Storage full or unavailable — silently ignore
   }
