@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useFormContext, useWatch, Controller } from "react-hook-form";
 import {
+  alpha,
   Button,
   Card,
   Group,
@@ -8,6 +9,8 @@ import {
   Radio,
   Stack,
   Text,
+  useComputedColorScheme,
+  useMantineTheme,
   MultiSelect,
 } from "@mantine/core";
 import { IconBus, IconWalk } from "@tabler/icons-react";
@@ -36,6 +39,17 @@ export function MovementItem({
   previousAddressLabel,
   disabled = false,
 }: MovementItemProps) {
+  const theme = useMantineTheme();
+  const colorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
+  const isDark = colorScheme === "dark";
+
+  const selectedBorderColor = isDark ? theme.colors.blue[4] : theme.colors.blue[6];
+  const selectedBackground = isDark
+    ? alpha(theme.colors.blue[7], 0.35)
+    : alpha(theme.colors.blue[1], 0.9);
+
   const {
     control,
     setValue,
@@ -111,10 +125,10 @@ export function MovementItem({
                           cursor: disabled ? "not-allowed" : "pointer",
                           opacity: disabled ? 0.7 : 1,
                           borderColor: selectedValue === "ON_FOOT"
-                            ? "var(--mantine-color-blue-6)"
+                            ? selectedBorderColor
                             : undefined,
                           background: selectedValue === "ON_FOOT"
-                            ? "var(--mantine-color-blue-0)"
+                            ? selectedBackground
                             : undefined,
                         }}
                       >
@@ -132,10 +146,10 @@ export function MovementItem({
                           cursor: disabled ? "not-allowed" : "pointer",
                           opacity: disabled ? 0.7 : 1,
                           borderColor: selectedValue === "TRANSPORT"
-                            ? "var(--mantine-color-blue-6)"
+                            ? selectedBorderColor
                             : undefined,
                           background: selectedValue === "TRANSPORT"
-                            ? "var(--mantine-color-blue-0)"
+                            ? selectedBackground
                             : undefined,
                         }}
                       >

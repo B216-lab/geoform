@@ -8,7 +8,7 @@ import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <MantineProvider defaultColorScheme="light">
+    <MantineProvider defaultColorScheme="auto">
       <App />
     </MantineProvider>
   </StrictMode>,
