@@ -1,0 +1,29 @@
+name: Publish to pre-prod
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+
+    steps:
+      - name: update docker image and restart
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PREPROD_HOST }}
+          username: ${{ secrets.PREPROD_USERNAME }}
+          key: ${{ secrets.PREPROD_KEY }}
+          port: ${{ secrets.PREPROD_PORT }}
+          script: |
+            cd /opt/geoform
+            docker compose down frontend
+            docker compose pull frontend
+            docker compose up -d

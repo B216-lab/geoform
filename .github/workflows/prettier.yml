@@ -1,0 +1,17 @@
+name: Lint with prettier
+on:
+  pull_request:
+    branches:
+      - main
+      - release/*
+  workflow_dispatch:
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - run: |
+          pnpm add -w prettier@3.7.1
+          pnpm prettier . --check

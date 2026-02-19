@@ -1,0 +1,4 @@
+min_version = '2025.10.18'
+
+[tools]
+node = "25"
