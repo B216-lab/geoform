@@ -1,5 +1,7 @@
 {
-    "recommendations": [
-        "denoland.vscode-deno"
-    ]
+  "recommendations": [
+    "denoland.vscode-deno",
+    "ms-vscode-remote.remote-containers",
+    "anysphere.remote-containers"
+  ]
 }
