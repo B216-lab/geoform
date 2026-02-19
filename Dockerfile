@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1.7
-
 FROM node:25-bullseye-slim AS base
 
 ENV PNPM_HOME="/pnpm"
@@ -7,6 +5,7 @@ ENV PATH="$PNPM_HOME:$PATH"
 
 WORKDIR /app
 
+# hadolint ignore=DL3016
 RUN npm install --global corepack && corepack enable
 
 COPY package.json pnpm-lock.yaml* ./
@@ -37,6 +36,7 @@ RUN pnpm run build
 
 FROM nginx:stable-alpine3.23-slim AS runtime
 
+# hadolint ignore=DL3018
 RUN apk add --no-cache gettext
 
 COPY --from=build /app/dist /usr/share/nginx/html
