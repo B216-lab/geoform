@@ -13,7 +13,6 @@ import {
   Card,
   Grid,
   Group,
-  ThemeIcon,
   NumberInput,
   Select,
   Stack,
@@ -133,6 +132,7 @@ export function DayMovementsForm() {
     trigger,
     formState: { errors },
     setValue,
+    clearErrors,
     getValues,
   } = methods;
 
@@ -184,6 +184,9 @@ export function DayMovementsForm() {
           shouldTouch: false,
           shouldValidate: false,
         });
+        if (nextDeparturePlace) {
+          clearErrors(`movements.${i}.departurePlace`);
+        }
       }
 
       if (
@@ -194,9 +197,12 @@ export function DayMovementsForm() {
           shouldTouch: false,
           shouldValidate: false,
         });
+        if (hasHouseNumber(nextDepartureAddress)) {
+          clearErrors(`movements.${i}.departureAddress`);
+        }
       }
     }
-  }, [movementChainSignature, movements, setValue, getValues]);
+  }, [movementChainSignature, movements, setValue, getValues, clearErrors]);
 
   const goToNextStep = useCallback(async () => {
     const valid = await trigger(
@@ -284,7 +290,7 @@ export function DayMovementsForm() {
       setValue("movements.0.departureAddress", homeAddress, {
         shouldDirty: false,
         shouldTouch: false,
-        shouldValidate: false,
+        shouldValidate: true,
       });
     }
 
@@ -333,7 +339,11 @@ export function DayMovementsForm() {
                       max="2018-12-01"
                       label="День рождения"
                       error={toError(errors.birthday?.message)}
-                      {...register("birthday")}
+                      {...register("birthday", {
+                        onChange: () => {
+                          void trigger("birthday");
+                        },
+                      })}
                     />
                   </Grid.Col>
                   <Grid.Col span={{ base: 12, sm: 4 }}>
@@ -345,7 +355,10 @@ export function DayMovementsForm() {
                           label="Пол"
                           data={genderOptions}
                           value={field.value ?? null}
-                          onChange={field.onChange}
+                          onChange={(value) => {
+                            field.onChange(value);
+                            void trigger("gender");
+                          }}
                           searchable
                           error={toError(errors.gender?.message)}
                         />
@@ -361,7 +374,10 @@ export function DayMovementsForm() {
                           label="Социальный статус"
                           data={socialStatusOptions}
                           value={field.value ?? null}
-                          onChange={field.onChange}
+                          onChange={(value) => {
+                            field.onChange(value);
+                            void trigger("socialStatus");
+                          }}
                           searchable
                           error={toError(errors.socialStatus?.message)}
                         />
@@ -377,9 +393,12 @@ export function DayMovementsForm() {
                     <AddressAutocomplete
                       value={field.value as DaDataAddressSuggestion | null}
                       onChange={(val) =>
-                        field.onChange(
-                          val as DayMovementsFormValues["homeAddress"],
-                        )
+                        {
+                          field.onChange(
+                            val as DayMovementsFormValues["homeAddress"],
+                          );
+                          void trigger("homeAddress");
+                        }
                       }
                       getAddressItems={getAddressItems}
                       delay={ADDRESS_DELAY}
@@ -479,15 +498,10 @@ export function DayMovementsForm() {
 
             {step === 1 && (
               <>
-                {/* <Alert title="Важно" color="blue" variant="light">
-                  Необходимо внести данные о всех передвижениях за выбранный день{" "}
-                  {movementsDate && <b>{movementsDate}</b>} и обязательно учитывать
-                  передвижения в пешей доступности.
-                </Alert> */}
-
                 <TextInput
                   type="date"
                   label="Дата передвижений"
+                  withAsterisk
                   description="Нужно будет описать передвижения за этот день"
                   max={movementsDateMax}
                   error={toError(errors.movementsDate?.message)}
@@ -503,15 +517,11 @@ export function DayMovementsForm() {
                       active={Math.max(fields.length, 0)}
                     >
                       <Timeline.Item
-                        bullet={
-                          <ThemeIcon size={20} radius="xl" variant="light">
-                            <IconMapPin size={14} />
-                          </ThemeIcon>
-                        }
+                        bullet={<IconMapPin size={12} />}
                       >
                         <Card withBorder radius="md" p="md">
                           <Stack gap="sm">
-                            <Text fw={600}>Точка старта</Text>
+                            <Text fw={600}>Отправление</Text>
                             <Grid>
                               <Grid.Col span={{ base: 12, sm: 4 }}>
                                 <Controller
@@ -519,7 +529,8 @@ export function DayMovementsForm() {
                                   name="movements.0.departureTime"
                                   render={({ field }) => (
                                     <TimePicker
-                                      label="Время старта"
+                                      label="Время"
+                                      withAsterisk
                                       value={field.value ?? ""}
                                       onChange={field.onChange}
                                       format="24h"
@@ -532,13 +543,14 @@ export function DayMovementsForm() {
                                   )}
                                 />
                               </Grid.Col>
-                              <Grid.Col span={{ base: 12, sm: 4 }}>
+                              <Grid.Col span={{ base: 12, sm: 8 }}>
                                 <Controller
                                   control={control}
                                   name="movements.0.departurePlace"
                                   render={({ field }) => (
                                     <Select
-                                      label="Пункт отправления"
+                                      label="Пункт"
+                                      withAsterisk
                                       data={enumToOptions(Place)}
                                       searchable
                                       value={field.value ?? null}
@@ -550,32 +562,31 @@ export function DayMovementsForm() {
                                   )}
                                 />
                               </Grid.Col>
-                              <Grid.Col span={{ base: 12, sm: 4 }}>
-                                <Controller
-                                  control={control}
-                                  name="movements.0.departureAddress"
-                                  render={({ field }) => (
-                                    <AddressAutocomplete
-                                      value={field.value as DaDataAddressSuggestion | null}
-                                      onChange={field.onChange}
-                                      getAddressItems={getAddressItems}
-                                      delay={ADDRESS_DELAY}
-                                      minChars={DEFAULT_MIN_CHARS}
-                                      disabled={startDeparturePlace === "HOME_RESIDENCE"}
-                                      label="Адрес отправления"
-                                      description={
-                                        startDeparturePlace === "HOME_RESIDENCE"
-                                          ? "Адрес подставлен из адреса проживания"
-                                          : undefined
-                                      }
-                                      error={toError(
-                                        errors.movements?.[0]?.departureAddress?.message,
-                                      )}
-                                    />
+                            </Grid>
+                            <Controller
+                              control={control}
+                              name="movements.0.departureAddress"
+                              render={({ field }) => (
+                                <AddressAutocomplete
+                                  value={field.value as DaDataAddressSuggestion | null}
+                                  onChange={field.onChange}
+                                  getAddressItems={getAddressItems}
+                                  delay={ADDRESS_DELAY}
+                                  minChars={DEFAULT_MIN_CHARS}
+                                  disabled={startDeparturePlace === "HOME_RESIDENCE"}
+                                  label="Адрес"
+                                  withAsterisk
+                                  description={
+                                    startDeparturePlace === "HOME_RESIDENCE"
+                                      ? "Адрес подставлен из адреса проживания"
+                                      : "Начните вводить адрес, чтобы увидеть подсказки. Необходимо выбрать из списка с точностью до дома"
+                                  }
+                                  error={toError(
+                                    errors.movements?.[0]?.departureAddress?.message,
                                   )}
                                 />
-                              </Grid.Col>
-                            </Grid>
+                              )}
+                            />
                           </Stack>
                         </Card>
                       </Timeline.Item>
@@ -592,14 +603,7 @@ export function DayMovementsForm() {
                               : (movements?.[index - 1]?.arrivalAddress?.value ?? null);
 
                           const items = [
-                            <Timeline.Item
-                              key={field.id}
-                              bullet={
-                                <ThemeIcon size={20} radius="xl" variant="light">
-                                  <IconMapPin size={14} />
-                                </ThemeIcon>
-                              }
-                            >
+                            <Timeline.Item key={field.id}>
                               <MovementItem
                                 index={index}
                                 onRemove={() => remove(index)}
@@ -614,11 +618,7 @@ export function DayMovementsForm() {
                             items.push(
                               <Timeline.Item
                                 key={`${field.id}-arrival`}
-                                bullet={
-                                  <ThemeIcon size={20} radius="xl" variant="light">
-                                    <IconMapPin size={14} />
-                                  </ThemeIcon>
-                                }
+                                bullet={<IconMapPin size={12} />}
                               >
                                 <ArrivalPointItem
                                   index={index}

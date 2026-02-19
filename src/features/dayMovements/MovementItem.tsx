@@ -58,7 +58,7 @@ export function MovementItem({
       setValue(`${prefix}.movementType`, "ON_FOOT", {
         shouldDirty: false,
         shouldTouch: false,
-        shouldValidate: false,
+        shouldValidate: true,
       });
     }
   }, [movementType, prefix, setValue]);

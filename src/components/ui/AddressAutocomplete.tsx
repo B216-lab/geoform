@@ -11,6 +11,7 @@ interface AddressAutocompleteProps {
   disabled?: boolean;
   placeholder?: string;
   label?: string;
+  withAsterisk?: boolean;
   description?: string;
   error?: string;
 }
@@ -24,6 +25,7 @@ export function AddressAutocomplete({
   disabled = false,
   placeholder = "Начните вводить адрес…",
   label,
+  withAsterisk = false,
   description,
   error,
 }: AddressAutocompleteProps) {
@@ -87,6 +89,7 @@ export function AddressAutocomplete({
       value={query}
       disabled={disabled}
       label={label}
+      withAsterisk={withAsterisk}
       description={description}
       error={error}
       placeholder={placeholder}

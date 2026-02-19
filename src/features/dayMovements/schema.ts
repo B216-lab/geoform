@@ -3,13 +3,28 @@ import { z } from "zod";
 /**
  * DaData address suggestion shape used in address fields.
  */
-export const daDataAddressSchema = z.object({
-  value: z.string(),
-  unrestricted_value: z.string().optional(),
-  data: z.record(z.unknown()),
-});
+export const daDataAddressSchema = z.object(
+  {
+    value: z.string(),
+    unrestricted_value: z.string().optional(),
+    data: z.record(z.unknown()),
+  },
+  {
+    required_error: "Обязательное поле",
+    invalid_type_error: "Обязательное поле",
+  },
+);
 
 export type DaDataAddressValue = z.infer<typeof daDataAddressSchema>;
+
+const REQUIRED_FIELD_MESSAGE = "Обязательное поле";
+
+const requiredStringSchema = z
+  .string({
+    required_error: REQUIRED_FIELD_MESSAGE,
+    invalid_type_error: REQUIRED_FIELD_MESSAGE,
+  })
+  .min(1, REQUIRED_FIELD_MESSAGE);
 
 /**
  * Validates that a DaData suggestion contains a house number.
@@ -58,13 +73,13 @@ export const movementSchema = z
     waitBetweenTransfersMinutes: z.coerce.number().int().min(0).max(180),
 
     // Departure
-    departureTime: z.string().min(1, "Обязательное поле"),
-    departurePlace: z.string().min(1, "Обязательное поле"),
+    departureTime: requiredStringSchema,
+    departurePlace: requiredStringSchema,
     departureAddress: daDataAddressSchema.nullable().optional(),
 
     // Arrival
-    arrivalTime: z.string().min(1, "Обязательное поле"),
-    arrivalPlace: z.string().min(1, "Обязательное поле"),
+    arrivalTime: requiredStringSchema,
+    arrivalPlace: requiredStringSchema,
     arrivalAddress: daDataAddressSchema.nullable().optional(),
 
     // Transport arrival extras
@@ -90,7 +105,7 @@ export const movementSchema = z
       if (!data.departureAddress) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Обязательное поле",
+          message: REQUIRED_FIELD_MESSAGE,
           path: ["departureAddress"],
         });
       } else if (!hasHouseNumber(data.departureAddress)) {
@@ -107,7 +122,7 @@ export const movementSchema = z
       if (!data.arrivalAddress) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Обязательное поле",
+          message: REQUIRED_FIELD_MESSAGE,
           path: ["arrivalAddress"],
         });
       } else if (!hasHouseNumber(data.arrivalAddress)) {
@@ -143,9 +158,9 @@ export const movementSchema = z
  */
 export const dayMovementsSchema = z.object({
   // Page 0 — general info
-  birthday: z.string().min(1, "Обязательное поле"),
-  gender: z.string().min(1, "Обязательное поле"),
-  socialStatus: z.string().min(1, "Обязательное поле"),
+  birthday: requiredStringSchema,
+  gender: requiredStringSchema,
+  socialStatus: requiredStringSchema,
   homeAddress: addressWithHouseSchema,
   transportCostMin: z.coerce.number().int().min(0).max(20000),
   transportCostMax: z.coerce.number().int().min(0).max(20000),
@@ -153,7 +168,7 @@ export const dayMovementsSchema = z.object({
   incomeMax: z.coerce.number().int().min(0).max(250000),
 
   // Page 1 — movements
-  movementsDate: z.string().min(1, "Обязательное поле"),
+  movementsDate: requiredStringSchema,
   movements: z
     .array(movementSchema)
     .min(1, "Добавьте хотя бы одно передвижение")

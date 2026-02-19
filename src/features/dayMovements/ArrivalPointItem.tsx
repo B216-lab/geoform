@@ -33,6 +33,7 @@ export function ArrivalPointItem({
     register,
     control,
     setValue,
+    clearErrors,
     formState: { errors },
   } = useFormContext<DayMovementsFormValues>();
 
@@ -58,8 +59,9 @@ export function ArrivalPointItem({
       setValue(`${prefix}.arrivalAddress`, homeAddress, {
         shouldDirty: false,
         shouldTouch: false,
-        shouldValidate: false,
+        shouldValidate: true,
       });
+      clearErrors(`${prefix}.arrivalAddress`);
     }
 
     if (
@@ -75,12 +77,19 @@ export function ArrivalPointItem({
     }
 
     previousArrivalPlaceRef.current = arrivalPlace;
-  }, [arrivalPlace, homeAddress, arrivalAddress?.value, prefix, setValue]);
+  }, [
+    arrivalPlace,
+    homeAddress,
+    arrivalAddress?.value,
+    prefix,
+    setValue,
+    clearErrors,
+  ]);
 
   return (
     <Card withBorder radius="md" p="lg" shadow="xs">
       <Stack gap="md">
-        <Text fw={600}>Точка прибытия {index + 1}</Text>
+        <Text fw={600}>Точка маршрута {index + 1}</Text>
 
         <Grid>
           <Grid.Col span={{ base: 12, sm: 4 }}>
@@ -89,7 +98,8 @@ export function ArrivalPointItem({
               name={`${prefix}.arrivalTime`}
               render={({ field }) => (
                 <TimePicker
-                  label="Время прибытия"
+                  label="Время"
+                  withAsterisk
                   value={field.value ?? ""}
                   onChange={field.onChange}
                   format="24h"
@@ -101,13 +111,14 @@ export function ArrivalPointItem({
               )}
             />
           </Grid.Col>
-          <Grid.Col span={{ base: 12, sm: 4 }}>
+          <Grid.Col span={{ base: 12, sm: 8 }}>
             <Controller
               control={control}
               name={`${prefix}.arrivalPlace`}
               render={({ field }) => (
                 <Select
-                  label="Пункт прибытия"
+                  label="Пункт"
+                  withAsterisk
                   data={placeOptions}
                   searchable
                   value={field.value ?? null}
@@ -118,30 +129,29 @@ export function ArrivalPointItem({
               )}
             />
           </Grid.Col>
-          <Grid.Col span={{ base: 12, sm: 4 }}>
-            <Controller
-              control={control}
-              name={`${prefix}.arrivalAddress`}
-              render={({ field }) => (
-                <AddressAutocomplete
-                  value={field.value ?? null}
-                  onChange={field.onChange}
-                  getAddressItems={getAddressItems}
-                  delay={addressDelay}
-                  minChars={addressMinChars}
-                  disabled={disabled || arrivalPlace === "HOME_RESIDENCE"}
-                  label="Адрес прибытия"
-                  description={arrivalPlace === "HOME_RESIDENCE"
-                    ? "Адрес подставлен из адреса проживания"
-                    : "Начните вводить с точностью до дома"}
-                  error={arrivalPlace === "HOME_RESIDENCE"
-                    ? undefined
-                    : toError(movementErrors?.arrivalAddress?.message)}
-                />
-              )}
-            />
-          </Grid.Col>
         </Grid>
+        <Controller
+          control={control}
+          name={`${prefix}.arrivalAddress`}
+          render={({ field }) => (
+            <AddressAutocomplete
+              value={field.value ?? null}
+              onChange={field.onChange}
+              getAddressItems={getAddressItems}
+              delay={addressDelay}
+              minChars={addressMinChars}
+              disabled={disabled || arrivalPlace === "HOME_RESIDENCE"}
+              label="Адрес"
+              withAsterisk
+              description={arrivalPlace === "HOME_RESIDENCE"
+                ? "Адрес подставлен из адреса проживания"
+                : "Начните вводить адрес, чтобы увидеть подсказки. Необходимо выбрать из списка с точностью до дома"}
+              error={arrivalPlace === "HOME_RESIDENCE"
+                ? undefined
+                : toError(movementErrors?.arrivalAddress?.message)}
+            />
+          )}
+        />
 
         {isTransport && (
           <Stack gap="md">
