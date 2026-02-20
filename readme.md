@@ -1,6 +1,12 @@
-# Custom geospatial web forms
+<p align="center">
+  <img src="./readme/screenshot.jpg" alt="Geoforms Logo" style="margin-bottom: 20px;" />
+</p>
 
-Forms built to collect geospatial related data
+<h1 align="center">Geospatial web forms</h1>
+
+<p align="center">
+  Forms built to collect geospatial related data
+</p>
 
 ## Development
 

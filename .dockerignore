@@ -12,3 +12,4 @@ coverage
 .dockerignore
 *.md
 .pnpm-store
+readme
