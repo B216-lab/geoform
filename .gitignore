@@ -2,3 +2,4 @@
 dist
 .pnpm-store
 node_modules
+docker-compose.yml

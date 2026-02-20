@@ -6,7 +6,8 @@ ENV PATH="$PNPM_HOME:$PATH"
 WORKDIR /app
 
 # hadolint ignore=DL3016
-RUN npm install --global corepack && corepack enable
+RUN if ! command -v corepack >/dev/null 2>&1; then npm i -g corepack@latest --force; fi \
+ && corepack enable
 
 COPY package.json pnpm-lock.yaml* ./
 
@@ -24,12 +25,10 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 
 COPY . .
 
-ARG VITE_API_BASE_URL
 ARG VITE_DADATA_KEY
 ARG VITE_DADATA_API
 
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL \
-    VITE_DADATA_KEY=$VITE_DADATA_KEY \
+ENV VITE_DADATA_KEY=$VITE_DADATA_KEY \
     VITE_DADATA_API=$VITE_DADATA_API
 
 RUN pnpm run build

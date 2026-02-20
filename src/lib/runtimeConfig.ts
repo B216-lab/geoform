@@ -4,7 +4,6 @@
  */
 interface AppConfig {
   API_BASE_URL?: string;
-  VITE_API_BASE_URL?: string;
 }
 
 declare global {
@@ -19,17 +18,13 @@ declare global {
  * environment variables without rebuilding the image.
  */
 export function getApiBaseUrl(): string {
-  const runtimeApiUrl = globalThis.__APP_CONFIG__?.API_BASE_URL;
+  const appConfig =
+    (globalThis as typeof globalThis & { __APP_CONFIG__?: AppConfig })
+      .__APP_CONFIG__;
+  const runtimeApiUrl = appConfig?.API_BASE_URL;
   if (runtimeApiUrl && runtimeApiUrl.trim() !== "") {
     return runtimeApiUrl.trim().replace(/\/+$/, "");
+  } else {
+    throw new Error("API_BASE_URL is not set");
   }
-
-  const runtimeLegacyUrl = globalThis.__APP_CONFIG__?.VITE_API_BASE_URL;
-  if (runtimeLegacyUrl && runtimeLegacyUrl.trim() !== "") {
-    return runtimeLegacyUrl.trim().replace(/\/+$/, "");
-  }
-
-  const buildTimeUrl =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:8081";
-  return buildTimeUrl.toString().trim().replace(/\/+$/, "");
 }
