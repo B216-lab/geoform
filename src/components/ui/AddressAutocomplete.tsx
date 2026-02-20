@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Autocomplete, Loader } from "@mantine/core";
+import { useTranslation } from "react-i18next";
 import type { DaDataAddressSuggestion } from "../../features/dayMovements/addressUtils.ts";
 
 interface AddressAutocompleteProps {
@@ -23,12 +24,13 @@ export function AddressAutocomplete({
   delay = 1000,
   minChars = 3,
   disabled = false,
-  placeholder = "Начните вводить адрес…",
+  placeholder,
   label,
   withAsterisk = false,
   description,
   error,
 }: AddressAutocompleteProps) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState(value?.value ?? "");
   const [suggestions, setSuggestions] = useState<DaDataAddressSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -92,7 +94,7 @@ export function AddressAutocomplete({
       withAsterisk={withAsterisk}
       description={description}
       error={error}
-      placeholder={placeholder}
+      placeholder={placeholder ?? t("common.addressPlaceholder")}
       onChange={handleInputChange}
       data={suggestions.map((s) => s.value)}
       filter={({ options }) => options}

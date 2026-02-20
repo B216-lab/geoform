@@ -1,8 +1,17 @@
 import { useEffect, useRef } from "react";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
-import { Card, Grid, NumberInput, Select, Stack, Text, Textarea } from "@mantine/core";
+import {
+  Card,
+  Grid,
+  NumberInput,
+  Select,
+  Stack,
+  Text,
+  Textarea,
+} from "@mantine/core";
 import { TimePicker } from "@mantine/dates";
 import { IconClockHour3 } from "@tabler/icons-react";
+import { useTranslation } from "react-i18next";
 import { AddressAutocomplete } from "../../components/ui/AddressAutocomplete.tsx";
 import { enumToOptions, Place } from "./enums.ts";
 import type { DaDataAddressSuggestion } from "./addressUtils.ts";
@@ -17,7 +26,6 @@ interface ArrivalPointItemProps {
   addressMinChars: number;
 }
 
-const placeOptions = enumToOptions(Place);
 const toError = (message: unknown) =>
   typeof message === "string" ? message : undefined;
 
@@ -29,6 +37,7 @@ export function ArrivalPointItem({
   addressDelay,
   addressMinChars,
 }: ArrivalPointItemProps) {
+  const { t } = useTranslation();
   const {
     register,
     control,
@@ -49,6 +58,7 @@ export function ArrivalPointItem({
   const previousArrivalPlaceRef = useRef<string | undefined>(arrivalPlace);
 
   const isTransport = movementType === "TRANSPORT";
+  const placeOptions = enumToOptions(Place, t, "enums.place");
 
   useEffect(() => {
     if (
@@ -89,7 +99,7 @@ export function ArrivalPointItem({
   return (
     <Card withBorder radius="md" p="lg" shadow="xs">
       <Stack gap="md">
-        <Text fw={600}>Точка маршрута {index + 1}</Text>
+        <Text fw={600}>{t("arrival.title", { index: index + 1 })}</Text>
 
         <Grid>
           <Grid.Col span={{ base: 12, sm: 4 }}>
@@ -98,7 +108,7 @@ export function ArrivalPointItem({
               name={`${prefix}.arrivalTime`}
               render={({ field }) => (
                 <TimePicker
-                  label="Время"
+                  label={t("form.time")}
                   withAsterisk
                   value={field.value ?? ""}
                   onChange={field.onChange}
@@ -117,7 +127,7 @@ export function ArrivalPointItem({
               name={`${prefix}.arrivalPlace`}
               render={({ field }) => (
                 <Select
-                  label="Пункт"
+                  label={t("form.point")}
                   withAsterisk
                   data={placeOptions}
                   searchable
@@ -141,11 +151,11 @@ export function ArrivalPointItem({
               delay={addressDelay}
               minChars={addressMinChars}
               disabled={disabled || arrivalPlace === "HOME_RESIDENCE"}
-              label="Адрес"
+              label={t("form.address")}
               withAsterisk
               description={arrivalPlace === "HOME_RESIDENCE"
-                ? "Адрес подставлен из адреса проживания"
-                : "Начните вводить адрес, чтобы увидеть подсказки. Необходимо выбрать из списка с точностью до дома"}
+                ? t("form.homeAddressAutofill")
+                : t("form.homeAddressDescription")}
               error={arrivalPlace === "HOME_RESIDENCE"
                 ? undefined
                 : toError(movementErrors?.arrivalAddress?.message)}
@@ -160,13 +170,15 @@ export function ArrivalPointItem({
               name={`${prefix}.walkFromFinishMinutes`}
               render={({ field }) => (
                 <NumberInput
-                  label="Пешком от конечной остановки / парковки до места прибытия, мин"
+                  label={t("arrival.walkFromFinish")}
                   min={0}
                   max={180}
                   value={field.value ?? undefined}
                   onChange={field.onChange}
                   disabled={disabled}
-                  error={toError(movementErrors?.walkFromFinishMinutes?.message)}
+                  error={toError(
+                    movementErrors?.walkFromFinishMinutes?.message,
+                  )}
                 />
               )}
             />
@@ -176,7 +188,7 @@ export function ArrivalPointItem({
               name={`${prefix}.tripCost`}
               render={({ field }) => (
                 <NumberInput
-                  label="Стоимость поездки / парковки, ₽"
+                  label={t("arrival.tripCost")}
                   min={0}
                   max={25000}
                   leftSection="₽"
@@ -191,9 +203,9 @@ export function ArrivalPointItem({
         )}
 
         <Textarea
-          label="Комментарий"
+          label={t("arrival.comment")}
           error={toError(movementErrors?.comment?.message)}
-          description="Особенности маршрута, проблемы, пожелания..."
+          description={t("arrival.commentDescription")}
           maxLength={2000}
           disabled={disabled}
           {...register(`${prefix}.comment`)}

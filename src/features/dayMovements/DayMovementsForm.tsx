@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  useForm,
-  useFieldArray,
-  FormProvider,
-  useWatch,
   Controller,
+  FormProvider,
+  useFieldArray,
+  useForm,
+  useWatch,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -18,11 +18,12 @@ import {
   Stack,
   Stepper,
   Text,
-  Timeline,
   TextInput,
+  Timeline,
 } from "@mantine/core";
 import { TimePicker } from "@mantine/dates";
 import { IconClockHour3, IconMapPin } from "@tabler/icons-react";
+import { useTranslation } from "react-i18next";
 import { AddressAutocomplete } from "../../components/ui/AddressAutocomplete.tsx";
 import { ArrivalPointItem } from "./ArrivalPointItem.tsx";
 import { MovementItem } from "./MovementItem.tsx";
@@ -30,12 +31,12 @@ import { SuccessScreen } from "../../components/SuccessScreen.tsx";
 import {
   buildNextMovementFromPrevious,
   chainMovements,
+  type DayMovementsFormValues,
   dayMovementsSchema,
   defaultFormValues,
   getTimelineStartPoint,
   mapTimelineFormToPayload,
   movementSchema,
-  type DayMovementsFormValues,
   type MovementValues,
 } from "./schema.ts";
 import { enumToOptions, Gender, Place, SocialStatus } from "./enums.ts";
@@ -44,9 +45,6 @@ import { submitDayMovementsForm } from "./formSubmission.ts";
 import { useDraftStore } from "./store.ts";
 import { ApiHttpError, ApiNetworkError } from "../../lib/api.ts";
 import type { DaDataAddressSuggestion } from "./addressUtils.ts";
-
-const genderOptions = enumToOptions(Gender);
-const socialStatusOptions = enumToOptions(SocialStatus);
 
 const PAGE0_FIELDS = [
   "birthday",
@@ -65,11 +63,6 @@ const toError = (message: unknown) =>
 const hasHouseNumber = (
   address: DaDataAddressSuggestion | null | undefined,
 ): boolean => !!address?.data?.house;
-
-const getPlaceLabel = (placeCode: string | undefined): string => {
-  if (!placeCode) return "Не указано";
-  return Place[placeCode as keyof typeof Place] ?? placeCode;
-};
 
 const isMovementLegReady = (
   movement: MovementValues | undefined,
@@ -107,7 +100,21 @@ const isStartPointReady = (
 };
 
 export function DayMovementsForm() {
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
+  const genderOptions = enumToOptions(Gender, t, "enums.gender");
+  const socialStatusOptions = enumToOptions(
+    SocialStatus,
+    t,
+    "enums.socialStatus",
+  );
+  const placeOptions = enumToOptions(Place, t, "enums.place");
+
+  const getPlaceLabel = (placeCode: string | undefined): string => {
+    if (!placeCode) return t("common.unspecified");
+    return t(`enums.place.${placeCode}`, { defaultValue: placeCode });
+  };
+
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -120,7 +127,7 @@ export function DayMovementsForm() {
     : defaultFormValues;
 
   const methods = useForm<DayMovementsFormValues>({
-    resolver: zodResolver(dayMovementsSchema),
+    resolver: zodResolver(dayMovementsSchema()),
     defaultValues: initialValues as DayMovementsFormValues,
     mode: "onTouched",
   });
@@ -190,7 +197,8 @@ export function DayMovementsForm() {
       }
 
       if (
-        (currDepartureAddress?.value ?? "") !== (nextDepartureAddress?.value ?? "")
+        (currDepartureAddress?.value ?? "") !==
+          (nextDepartureAddress?.value ?? "")
       ) {
         setValue(`movements.${i}.departureAddress`, nextDepartureAddress, {
           shouldDirty: false,
@@ -231,15 +239,15 @@ export function DayMovementsForm() {
         clearMovements();
       } catch (err) {
         if (err instanceof ApiNetworkError || err instanceof ApiHttpError) {
-          setSubmitError(err.message || "Ошибка при отправке формы.");
+          setSubmitError(err.message || t("errors.submitFailed"));
         } else {
-          setSubmitError("Произошла ошибка при отправке формы.");
+          setSubmitError(t("errors.submitUnexpected"));
         }
       } finally {
         setIsSubmitting(false);
       }
     },
-    [clearMovements],
+    [clearMovements, t],
   );
 
   const handleFillAnother = useCallback(() => {
@@ -274,10 +282,10 @@ export function DayMovementsForm() {
   );
   const isFirstDepartureReady = isStartPointReady(chainedMovements[0]);
   const allMovementsComplete = chainedMovements.every((movement) =>
-    movementSchema.safeParse(movement).success
+    movementSchema().safeParse(movement).success
   );
-  const canAddMovement =
-    isMovementsDateSet && fields.length < 15 && allMovementsComplete;
+  const canAddMovement = isMovementsDateSet && fields.length < 15 &&
+    allMovementsComplete;
   const movementsDateMax = new Date().toISOString().slice(0, 10);
   const previousStartPlaceRef = useRef<string | undefined>(startDeparturePlace);
 
@@ -324,8 +332,8 @@ export function DayMovementsForm() {
             allowNextStepsSelect={false}
             iconSize={28}
           >
-            <Stepper.Step label="Общая информация" />
-            <Stepper.Step label="Передвижения" />
+            <Stepper.Step label={t("form.stepGeneral")} />
+            <Stepper.Step label={t("form.stepMovements")} />
           </Stepper>
 
           <Stack mt="lg" gap="md">
@@ -337,7 +345,7 @@ export function DayMovementsForm() {
                       type="date"
                       min="1956-12-01"
                       max="2018-12-01"
-                      label="День рождения"
+                      label={t("form.birthday")}
                       error={toError(errors.birthday?.message)}
                       {...register("birthday", {
                         onChange: () => {
@@ -352,7 +360,7 @@ export function DayMovementsForm() {
                       name="gender"
                       render={({ field }) => (
                         <Select
-                          label="Пол"
+                          label={t("form.gender")}
                           data={genderOptions}
                           value={field.value ?? null}
                           onChange={(value) => {
@@ -371,7 +379,7 @@ export function DayMovementsForm() {
                       name="socialStatus"
                       render={({ field }) => (
                         <Select
-                          label="Социальный статус"
+                          label={t("form.socialStatus")}
                           data={socialStatusOptions}
                           value={field.value ?? null}
                           onChange={(value) => {
@@ -392,26 +400,28 @@ export function DayMovementsForm() {
                   render={({ field }) => (
                     <AddressAutocomplete
                       value={field.value as DaDataAddressSuggestion | null}
-                      onChange={(val) =>
-                        {
-                          field.onChange(
-                            val as DayMovementsFormValues["homeAddress"],
-                          );
-                          void trigger("homeAddress");
-                        }
-                      }
+                      onChange={(val) => {
+                        field.onChange(
+                          val as DayMovementsFormValues["homeAddress"],
+                        );
+                        void trigger("homeAddress");
+                      }}
                       getAddressItems={getAddressItems}
                       delay={ADDRESS_DELAY}
                       minChars={DEFAULT_MIN_CHARS}
-                      label="Адрес проживания"
-                      description="Начните вводить адрес, чтобы увидеть подсказки. Необходимо выбрать из списка с точностью до дома"
+                      label={t("form.homeAddress")}
+                      description={t("form.homeAddressDescription")}
                       error={toError(errors.homeAddress?.message)}
                     />
                   )}
                 />
 
                 <Stack gap="xs">
-                  <Text fw={600}>Расходы на транспорт, ₽/мес</Text>
+                  <Text fw={600}>
+                    {t("form.transportCostsTitle", {
+                      period: t("common.currencyPerMonth"),
+                    })}
+                  </Text>
                   <Grid>
                     <Grid.Col span={{ base: 12, sm: 6 }}>
                       <Controller
@@ -419,7 +429,7 @@ export function DayMovementsForm() {
                         name="transportCostMin"
                         render={({ field }) => (
                           <NumberInput
-                            label="Минимум"
+                            label={t("common.min")}
                             min={0}
                             max={20000}
                             leftSection="₽"
@@ -436,7 +446,7 @@ export function DayMovementsForm() {
                         name="transportCostMax"
                         render={({ field }) => (
                           <NumberInput
-                            label="Максимум"
+                            label={t("common.max")}
                             min={0}
                             max={20000}
                             leftSection="₽"
@@ -451,7 +461,11 @@ export function DayMovementsForm() {
                 </Stack>
 
                 <Stack gap="xs">
-                  <Text fw={600}>Доход, ₽/мес</Text>
+                  <Text fw={600}>
+                    {t("form.incomeTitle", {
+                      period: t("common.currencyPerMonth"),
+                    })}
+                  </Text>
                   <Grid>
                     <Grid.Col span={{ base: 12, sm: 6 }}>
                       <Controller
@@ -459,7 +473,7 @@ export function DayMovementsForm() {
                         name="incomeMin"
                         render={({ field }) => (
                           <NumberInput
-                            label="Минимум"
+                            label={t("common.min")}
                             min={0}
                             max={250000}
                             leftSection="₽"
@@ -476,7 +490,7 @@ export function DayMovementsForm() {
                         name="incomeMax"
                         render={({ field }) => (
                           <NumberInput
-                            label="Максимум"
+                            label={t("common.max")}
                             min={0}
                             max={250000}
                             leftSection="₽"
@@ -491,7 +505,7 @@ export function DayMovementsForm() {
                 </Stack>
 
                 <Group justify="flex-end">
-                  <Button onClick={goToNextStep}>Далее</Button>
+                  <Button onClick={goToNextStep}>{t("common.next")}</Button>
                 </Group>
               </>
             )}
@@ -500,14 +514,13 @@ export function DayMovementsForm() {
               <>
                 <TextInput
                   type="date"
-                  label="Дата передвижений"
+                  label={t("form.movementsDate")}
                   withAsterisk
-                  description="Нужно будет описать передвижения за этот день"
+                  description={t("form.movementsDateDescription")}
                   max={movementsDateMax}
                   error={toError(errors.movementsDate?.message)}
                   {...register("movementsDate")}
                 />
-
 
                 {isMovementsDateSet && (
                   <>
@@ -521,7 +534,7 @@ export function DayMovementsForm() {
                       >
                         <Card withBorder radius="md" p="md">
                           <Stack gap="sm">
-                            <Text fw={600}>Отправление</Text>
+                            <Text fw={600}>{t("form.departure")}</Text>
                             <Grid>
                               <Grid.Col span={{ base: 12, sm: 4 }}>
                                 <Controller
@@ -529,7 +542,7 @@ export function DayMovementsForm() {
                                   name="movements.0.departureTime"
                                   render={({ field }) => (
                                     <TimePicker
-                                      label="Время"
+                                      label={t("form.time")}
                                       withAsterisk
                                       value={field.value ?? ""}
                                       onChange={field.onChange}
@@ -537,7 +550,8 @@ export function DayMovementsForm() {
                                       withSeconds={false}
                                       leftSection={<IconClockHour3 size={16} />}
                                       error={toError(
-                                        errors.movements?.[0]?.departureTime?.message,
+                                        errors.movements?.[0]?.departureTime
+                                          ?.message,
                                       )}
                                     />
                                   )}
@@ -549,14 +563,15 @@ export function DayMovementsForm() {
                                   name="movements.0.departurePlace"
                                   render={({ field }) => (
                                     <Select
-                                      label="Пункт"
+                                      label={t("form.point")}
                                       withAsterisk
-                                      data={enumToOptions(Place)}
+                                      data={placeOptions}
                                       searchable
                                       value={field.value ?? null}
                                       onChange={field.onChange}
                                       error={toError(
-                                        errors.movements?.[0]?.departurePlace?.message,
+                                        errors.movements?.[0]?.departurePlace
+                                          ?.message,
                                       )}
                                     />
                                   )}
@@ -568,21 +583,24 @@ export function DayMovementsForm() {
                               name="movements.0.departureAddress"
                               render={({ field }) => (
                                 <AddressAutocomplete
-                                  value={field.value as DaDataAddressSuggestion | null}
+                                  value={field.value as
+                                    | DaDataAddressSuggestion
+                                    | null}
                                   onChange={field.onChange}
                                   getAddressItems={getAddressItems}
                                   delay={ADDRESS_DELAY}
                                   minChars={DEFAULT_MIN_CHARS}
-                                  disabled={startDeparturePlace === "HOME_RESIDENCE"}
-                                  label="Адрес"
+                                  disabled={startDeparturePlace ===
+                                    "HOME_RESIDENCE"}
+                                  label={t("form.address")}
                                   withAsterisk
-                                  description={
-                                    startDeparturePlace === "HOME_RESIDENCE"
-                                      ? "Адрес подставлен из адреса проживания"
-                                      : "Начните вводить адрес, чтобы увидеть подсказки. Необходимо выбрать из списка с точностью до дома"
-                                  }
+                                  description={startDeparturePlace ===
+                                      "HOME_RESIDENCE"
+                                    ? t("form.homeAddressAutofill")
+                                    : t("form.homeAddressDescription")}
                                   error={toError(
-                                    errors.movements?.[0]?.departureAddress?.message,
+                                    errors.movements?.[0]?.departureAddress
+                                      ?.message,
                                   )}
                                 />
                               )}
@@ -593,14 +611,16 @@ export function DayMovementsForm() {
 
                       {isFirstDepartureReady &&
                         fields.flatMap((field, index) => {
-                          const previousPlaceLabel =
-                            index === 0
-                              ? getPlaceLabel(timelineStartPoint.departurePlace)
-                              : getPlaceLabel(movements?.[index - 1]?.arrivalPlace);
-                          const previousAddressLabel =
-                            index === 0
-                              ? (timelineStartPoint.departureAddress?.value ?? null)
-                              : (movements?.[index - 1]?.arrivalAddress?.value ?? null);
+                          const previousPlaceLabel = index === 0
+                            ? getPlaceLabel(timelineStartPoint.departurePlace)
+                            : getPlaceLabel(
+                              movements?.[index - 1]?.arrivalPlace,
+                            );
+                          const previousAddressLabel = index === 0
+                            ? (timelineStartPoint.departureAddress?.value ??
+                              null)
+                            : (movements?.[index - 1]?.arrivalAddress?.value ??
+                              null);
 
                           const items = [
                             <Timeline.Item key={field.id}>
@@ -636,8 +656,11 @@ export function DayMovementsForm() {
                     </Timeline>
 
                     {isFirstDepartureReady && canAddMovement && (
-                      <Button variant="light" onClick={addMovementIfPreviousValid}>
-                        Добавить передвижение
+                      <Button
+                        variant="light"
+                        onClick={addMovementIfPreviousValid}
+                      >
+                        {t("form.addMovement")}
                       </Button>
                     )}
                   </>
@@ -647,10 +670,10 @@ export function DayMovementsForm() {
 
                 <Group justify="space-between">
                   <Button variant="default" onClick={goToPreviousStep}>
-                    Назад
+                    {t("common.back")}
                   </Button>
                   <Button type="submit" loading={isSubmitting}>
-                    Завершить
+                    {t("common.finish")}
                   </Button>
                 </Group>
               </>

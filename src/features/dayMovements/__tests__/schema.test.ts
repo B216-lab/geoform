@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { dayMovementsSchema, type DayMovementsFormValues } from "../schema.ts";
+import { describe, expect, it } from "vitest";
+import { type DayMovementsFormValues, dayMovementsSchema } from "../schema.ts";
 
 function validFormData(): DayMovementsFormValues {
   return {
@@ -37,14 +37,14 @@ function validFormData(): DayMovementsFormValues {
 
 describe("dayMovementsSchema", () => {
   it("accepts valid form data", () => {
-    const result = dayMovementsSchema.safeParse(validFormData());
+    const result = dayMovementsSchema().safeParse(validFormData());
     expect(result.success).toBe(true);
   });
 
   it("rejects empty birthday", () => {
     const data = validFormData();
     data.birthday = "";
-    const result = dayMovementsSchema.safeParse(data);
+    const result = dayMovementsSchema().safeParse(data);
     expect(result.success).toBe(false);
   });
 
@@ -54,14 +54,14 @@ describe("dayMovementsSchema", () => {
       value: "ул. Ленина",
       data: { geo_lat: "52.0", geo_lon: "104.0" },
     };
-    const result = dayMovementsSchema.safeParse(data);
+    const result = dayMovementsSchema().safeParse(data);
     expect(result.success).toBe(false);
   });
 
   it("rejects empty movements array", () => {
     const data = validFormData();
     data.movements = [];
-    const result = dayMovementsSchema.safeParse(data);
+    const result = dayMovementsSchema().safeParse(data);
     expect(result.success).toBe(false);
   });
 
@@ -69,7 +69,7 @@ describe("dayMovementsSchema", () => {
     const data = validFormData();
     data.movements[0]!.movementType = "TRANSPORT";
     data.movements[0]!.transport = [];
-    const result = dayMovementsSchema.safeParse(data);
+    const result = dayMovementsSchema().safeParse(data);
     expect(result.success).toBe(false);
   });
 
@@ -77,7 +77,7 @@ describe("dayMovementsSchema", () => {
     const data = validFormData();
     data.movements[0]!.arrivalPlace = "WORKPLACE";
     data.movements[0]!.arrivalAddress = null;
-    const result = dayMovementsSchema.safeParse(data);
+    const result = dayMovementsSchema().safeParse(data);
     expect(result.success).toBe(false);
   });
 });

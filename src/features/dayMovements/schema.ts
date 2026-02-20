@@ -1,30 +1,33 @@
 import { z } from "zod";
+import i18n from "../../lib/i18n.ts";
 
 /**
  * DaData address suggestion shape used in address fields.
  */
-export const daDataAddressSchema = z.object(
-  {
-    value: z.string(),
-    unrestricted_value: z.string().optional(),
-    data: z.record(z.unknown()),
-  },
-  {
-    required_error: "Обязательное поле",
-    invalid_type_error: "Обязательное поле",
-  },
-);
+export const daDataAddressSchema = () =>
+  z.object(
+    {
+      value: z.string(),
+      unrestricted_value: z.string().optional(),
+      data: z.record(z.unknown()),
+    },
+    {
+      required_error: i18n.t("validation.required"),
+      invalid_type_error: i18n.t("validation.required"),
+    },
+  );
 
-export type DaDataAddressValue = z.infer<typeof daDataAddressSchema>;
+export type DaDataAddressValue = z.infer<
+  ReturnType<typeof daDataAddressSchema>
+>;
 
-const REQUIRED_FIELD_MESSAGE = "Обязательное поле";
-
-const requiredStringSchema = z
-  .string({
-    required_error: REQUIRED_FIELD_MESSAGE,
-    invalid_type_error: REQUIRED_FIELD_MESSAGE,
-  })
-  .min(1, REQUIRED_FIELD_MESSAGE);
+const requiredStringSchema = () =>
+  z
+    .string({
+      required_error: i18n.t("validation.required"),
+      invalid_type_error: i18n.t("validation.required"),
+    })
+    .min(1, i18n.t("validation.required"));
 
 /**
  * Validates that a DaData suggestion contains a house number.
@@ -53,15 +56,16 @@ function isSameAddress(
   return !!leftValue && leftValue === rightValue;
 }
 
-const addressWithHouseSchema = daDataAddressSchema.refine(hasHouseNumber, {
-  message: "Адрес должен содержать номер дома",
-});
+const addressWithHouseSchema = () =>
+  daDataAddressSchema().refine(hasHouseNumber, {
+    message: i18n.t("validation.addressMustContainHouse"),
+  });
 
 /**
  * A single movement entry within the day.
  */
-export const movementSchema = z
-  .object({
+export const movementSchema = () =>
+  z.object({
     movementType: z.enum(["ON_FOOT", "TRANSPORT"]),
 
     // Transport-specific (required when movementType === "TRANSPORT")
@@ -73,28 +77,27 @@ export const movementSchema = z
     waitBetweenTransfersMinutes: z.coerce.number().int().min(0).max(180),
 
     // Departure
-    departureTime: requiredStringSchema,
-    departurePlace: requiredStringSchema,
-    departureAddress: daDataAddressSchema.nullable().optional(),
+    departureTime: requiredStringSchema(),
+    departurePlace: requiredStringSchema(),
+    departureAddress: daDataAddressSchema().nullable().optional(),
 
     // Arrival
-    arrivalTime: requiredStringSchema,
-    arrivalPlace: requiredStringSchema,
-    arrivalAddress: daDataAddressSchema.nullable().optional(),
+    arrivalTime: requiredStringSchema(),
+    arrivalPlace: requiredStringSchema(),
+    arrivalAddress: daDataAddressSchema().nullable().optional(),
 
     // Transport arrival extras
     walkFromFinishMinutes: z.coerce.number().int().min(0).max(180).optional(),
     tripCost: z.coerce.number().int().min(0).max(25000).nullable().optional(),
 
     comment: z.string().max(2000).optional(),
-  })
-  .superRefine((data, ctx) => {
+  }).superRefine((data, ctx) => {
     // Conditional: transport fields required when movementType is TRANSPORT
     if (data.movementType === "TRANSPORT") {
       if (!data.transport || data.transport.length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Выберите хотя бы один тип транспорта",
+          message: i18n.t("validation.selectAtLeastOneTransport"),
           path: ["transport"],
         });
       }
@@ -105,13 +108,13 @@ export const movementSchema = z
       if (!data.departureAddress) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: REQUIRED_FIELD_MESSAGE,
+          message: i18n.t("validation.required"),
           path: ["departureAddress"],
         });
       } else if (!hasHouseNumber(data.departureAddress)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Адрес должен содержать номер дома",
+          message: i18n.t("validation.addressMustContainHouse"),
           path: ["departureAddress"],
         });
       }
@@ -122,21 +125,20 @@ export const movementSchema = z
       if (!data.arrivalAddress) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: REQUIRED_FIELD_MESSAGE,
+          message: i18n.t("validation.required"),
           path: ["arrivalAddress"],
         });
       } else if (!hasHouseNumber(data.arrivalAddress)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Адрес должен содержать номер дома",
+          message: i18n.t("validation.addressMustContainHouse"),
           path: ["arrivalAddress"],
         });
       }
     }
 
     // Prevent zero-distance movement: home -> home or same address twice in a row.
-    const sameHome =
-      data.departurePlace === "HOME_RESIDENCE" &&
+    const sameHome = data.departurePlace === "HOME_RESIDENCE" &&
       data.arrivalPlace === "HOME_RESIDENCE";
     const sameAddressPoint = isSameAddress(
       data.departureAddress,
@@ -146,8 +148,7 @@ export const movementSchema = z
     if (sameHome || sameAddressPoint) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message:
-          "Пункт отправления и пункт прибытия не могут быть одинаковыми для одного передвижения",
+        message: i18n.t("validation.departureArrivalMustDiffer"),
         path: ["arrivalPlace"],
       });
     }
@@ -156,27 +157,30 @@ export const movementSchema = z
 /**
  * Top-level form schema for the DayMovements form.
  */
-export const dayMovementsSchema = z.object({
-  // Page 0 — general info
-  birthday: requiredStringSchema,
-  gender: requiredStringSchema,
-  socialStatus: requiredStringSchema,
-  homeAddress: addressWithHouseSchema,
-  transportCostMin: z.coerce.number().int().min(0).max(20000),
-  transportCostMax: z.coerce.number().int().min(0).max(20000),
-  incomeMin: z.coerce.number().int().min(0).max(250000),
-  incomeMax: z.coerce.number().int().min(0).max(250000),
+export const dayMovementsSchema = () =>
+  z.object({
+    // Page 0 — general info
+    birthday: requiredStringSchema(),
+    gender: requiredStringSchema(),
+    socialStatus: requiredStringSchema(),
+    homeAddress: addressWithHouseSchema(),
+    transportCostMin: z.coerce.number().int().min(0).max(20000),
+    transportCostMax: z.coerce.number().int().min(0).max(20000),
+    incomeMin: z.coerce.number().int().min(0).max(250000),
+    incomeMax: z.coerce.number().int().min(0).max(250000),
 
-  // Page 1 — movements
-  movementsDate: requiredStringSchema,
-  movements: z
-    .array(movementSchema)
-    .min(1, "Добавьте хотя бы одно передвижение")
-    .max(15),
-});
+    // Page 1 — movements
+    movementsDate: requiredStringSchema(),
+    movements: z
+      .array(movementSchema())
+      .min(1, i18n.t("validation.addAtLeastOneMovement"))
+      .max(15),
+  });
 
-export type DayMovementsFormValues = z.infer<typeof dayMovementsSchema>;
-export type MovementValues = z.infer<typeof movementSchema>;
+export type DayMovementsFormValues = z.infer<
+  ReturnType<typeof dayMovementsSchema>
+>;
+export type MovementValues = z.infer<ReturnType<typeof movementSchema>>;
 
 export interface TimelineStartPoint {
   departureTime: string;

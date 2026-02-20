@@ -1,4 +1,5 @@
 import { getApiBaseUrl } from "./runtimeConfig.ts";
+import i18n from "./i18n.ts";
 
 /**
  * Network-level error (server unreachable, timeout, etc.).
@@ -55,20 +56,22 @@ export async function apiFetch(
       credentials: "include",
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof TypeError
-        ? "Не удалось подключиться к серверу. Проверьте, что сервер запущен."
-        : "Ошибка сети при подключении к серверу.";
+    const errorMessage = error instanceof TypeError
+      ? i18n.t("errors.networkConnectWithHint")
+      : i18n.t("errors.networkGeneric");
     throw new ApiNetworkError(errorMessage, error);
   }
 
   if (!response.ok) {
-    let errorMessage = `Ошибка сервера: ${response.status} ${response.statusText}`;
+    let errorMessage = i18n.t("errors.serverErrorWithStatus", {
+      status: response.status,
+      statusText: response.statusText,
+    });
 
     if (response.status === 404) {
-      errorMessage = "Сервер недоступен или эндпоинт не найден.";
+      errorMessage = i18n.t("errors.endpointNotFound");
     } else if (response.status >= 500) {
-      errorMessage = "Внутренняя ошибка сервера. Попробуйте позже.";
+      errorMessage = i18n.t("errors.internalServer");
     }
 
     throw new ApiHttpError(errorMessage, response.status, response.statusText);

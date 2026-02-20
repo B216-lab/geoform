@@ -1,10 +1,21 @@
-import { Button, Card, Center, Stack, Text, ThemeIcon, Title } from "@mantine/core";
+import {
+  Button,
+  Card,
+  Center,
+  Stack,
+  Text,
+  ThemeIcon,
+  Title,
+} from "@mantine/core";
+import { useTranslation } from "react-i18next";
 
 interface SuccessScreenProps {
   onFillAnother: () => void;
 }
 
 export function SuccessScreen({ onFillAnother }: SuccessScreenProps) {
+  const { t } = useTranslation();
+
   return (
     <Center py={48} data-testid="success-screen">
       <Card withBorder radius="md" shadow="sm" maw={720} w="100%" p="xl">
@@ -20,14 +31,17 @@ export function SuccessScreen({ onFillAnother }: SuccessScreenProps) {
           </ThemeIcon>
           <Stack align="center" gap={4}>
             <Title order={2} data-testid="success-title">
-              Спасибо!
+              {t("success.title")}
             </Title>
             <Text c="dimmed" ta="center" data-testid="success-message">
-              Ваша форма успешно отправлена. Благодарим за участие в опросе.
+              {t("success.message")}
             </Text>
           </Stack>
-          <Button onClick={onFillAnother} data-testid="fill-another-form-button">
-            Заполнить еще одну форму
+          <Button
+            onClick={onFillAnother}
+            data-testid="fill-another-form-button"
+          >
+            {t("success.fillAnother")}
           </Button>
         </Stack>
       </Card>

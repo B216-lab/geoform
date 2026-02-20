@@ -1,20 +1,21 @@
 import { useEffect } from "react";
-import { useFormContext, useWatch, Controller } from "react-hook-form";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
 import {
   alpha,
   Button,
   Card,
   Group,
+  MultiSelect,
   NumberInput,
   Radio,
   Stack,
   Text,
   useComputedColorScheme,
   useMantineTheme,
-  MultiSelect,
 } from "@mantine/core";
 import { IconBus, IconWalk } from "@tabler/icons-react";
-import { enumToOptions, TypeMovement, Transport } from "./enums.ts";
+import { useTranslation } from "react-i18next";
+import { enumToOptions, Transport, TypeMovement } from "./enums.ts";
 import type { DayMovementsFormValues } from "./schema.ts";
 
 interface MovementItemProps {
@@ -25,8 +26,6 @@ interface MovementItemProps {
   previousAddressLabel: string | null;
   disabled?: boolean;
 }
-
-const transportOptions = enumToOptions(Transport);
 
 const toError = (message: unknown) =>
   typeof message === "string" ? message : undefined;
@@ -39,13 +38,16 @@ export function MovementItem({
   previousAddressLabel,
   disabled = false,
 }: MovementItemProps) {
+  const { t } = useTranslation();
   const theme = useMantineTheme();
   const colorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   });
   const isDark = colorScheme === "dark";
 
-  const selectedBorderColor = isDark ? theme.colors.blue[4] : theme.colors.blue[6];
+  const selectedBorderColor = isDark
+    ? theme.colors.blue[4]
+    : theme.colors.blue[6];
   const selectedBackground = isDark
     ? alpha(theme.colors.blue[7], 0.35)
     : alpha(theme.colors.blue[1], 0.9);
@@ -64,8 +66,9 @@ export function MovementItem({
     useWatch({ control, name: `${prefix}.transport` }) ?? [];
 
   const isTransport = movementType === "TRANSPORT";
-  const showPeopleInCar =
-    transports.includes("CAR_SHARING") || transports.includes("PRIVATE_CAR");
+  const showPeopleInCar = transports.includes("CAR_SHARING") ||
+    transports.includes("PRIVATE_CAR");
+  const transportOptions = enumToOptions(Transport, t, "enums.transport");
 
   useEffect(() => {
     if (!movementType) {
@@ -81,14 +84,15 @@ export function MovementItem({
     <Card withBorder radius="md" p="lg" shadow="xs">
       <Stack gap="md">
         <GroupHeader
-          title={`Передвижение ${index + 1}`}
+          title={t("movement.title", { index: index + 1 })}
+          removeLabel={t("movement.remove")}
           canRemove={canRemove && !disabled}
           onRemove={onRemove}
         />
 
         <Stack gap={2}>
           <Text size="sm" c="dimmed">
-            Откуда
+            {t("movement.from")}
           </Text>
           <Text size="sm" fw={500}>
             {previousPlaceLabel}
@@ -99,7 +103,6 @@ export function MovementItem({
             </Text>
           )}
         </Stack>
-
 
         <Controller
           control={control}
@@ -134,7 +137,9 @@ export function MovementItem({
                       >
                         <Stack align="center" gap={6}>
                           <IconWalk size={18} />
-                          <Text size="sm">{TypeMovement.ON_FOOT}</Text>
+                          <Text size="sm">
+                            {t(`enums.typeMovement.${TypeMovement.ON_FOOT}`)}
+                          </Text>
                         </Stack>
                       </Radio.Card>
                       <Radio.Card
@@ -155,7 +160,9 @@ export function MovementItem({
                       >
                         <Stack align="center" gap={6}>
                           <IconBus size={18} />
-                          <Text size="sm">{TypeMovement.TRANSPORT}</Text>
+                          <Text size="sm">
+                            {t(`enums.typeMovement.${TypeMovement.TRANSPORT}`)}
+                          </Text>
                         </Stack>
                       </Radio.Card>
                     </Group>
@@ -177,7 +184,7 @@ export function MovementItem({
             name={`${prefix}.transport`}
             render={({ field }) => (
               <MultiSelect
-                label="Тип транспорта"
+                label={t("movement.transportType")}
                 data={transportOptions}
                 value={field.value ?? []}
                 onChange={field.onChange}
@@ -195,7 +202,7 @@ export function MovementItem({
             name={`${prefix}.numberPeopleInCar`}
             render={({ field }) => (
               <NumberInput
-                label="Количество людей в автомобиле"
+                label={t("movement.peopleInCar")}
                 min={1}
                 max={15}
                 value={field.value ?? undefined}
@@ -209,13 +216,13 @@ export function MovementItem({
 
         {isTransport && (
           <Stack gap="md">
-            <Text fw={600}>Транспортные параметры</Text>
+            <Text fw={600}>{t("movement.transportParams")}</Text>
             <Controller
               control={control}
               name={`${prefix}.walkToStartMinutes`}
               render={({ field }) => (
                 <NumberInput
-                  label="Пешком до начальной остановки / парковки, мин"
+                  label={t("movement.walkToStart")}
                   min={0}
                   max={180}
                   value={field.value ?? undefined}
@@ -230,7 +237,7 @@ export function MovementItem({
               name={`${prefix}.waitAtStartMinutes`}
               render={({ field }) => (
                 <NumberInput
-                  label="Ожидание на начальной остановке, мин"
+                  label={t("movement.waitAtStart")}
                   min={0}
                   max={180}
                   value={field.value ?? undefined}
@@ -245,7 +252,7 @@ export function MovementItem({
               name={`${prefix}.numberOfTransfers`}
               render={({ field }) => (
                 <NumberInput
-                  label="Количество пересадок"
+                  label={t("movement.transfersCount")}
                   min={0}
                   max={15}
                   value={field.value ?? 0}
@@ -260,7 +267,7 @@ export function MovementItem({
               name={`${prefix}.waitBetweenTransfersMinutes`}
               render={({ field }) => (
                 <NumberInput
-                  label="Ожидание при пересадках, мин"
+                  label={t("movement.waitBetweenTransfers")}
                   min={0}
                   max={180}
                   value={field.value ?? 0}
@@ -281,11 +288,14 @@ export function MovementItem({
 
 interface GroupHeaderProps {
   title: string;
+  removeLabel: string;
   canRemove: boolean;
   onRemove: () => void;
 }
 
-function GroupHeader({ title, canRemove, onRemove }: GroupHeaderProps) {
+function GroupHeader(
+  { title, removeLabel, canRemove, onRemove }: GroupHeaderProps,
+) {
   return (
     <div
       style={{
@@ -296,8 +306,13 @@ function GroupHeader({ title, canRemove, onRemove }: GroupHeaderProps) {
     >
       <Text fw={600}>{title}</Text>
       {canRemove && (
-        <Button variant="subtle" color="red" size="compact-sm" onClick={onRemove}>
-          Удалить
+        <Button
+          variant="subtle"
+          color="red"
+          size="compact-sm"
+          onClick={onRemove}
+        >
+          {removeLabel}
         </Button>
       )}
     </div>
