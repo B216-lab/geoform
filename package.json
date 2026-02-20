@@ -51,6 +51,6 @@
       "deno lint --fix"
     ],
     "*.{json,md}": "deno fmt",
-    "Dockerfile": "hadolint Dockerfile"
+    "Dockerfile": "hadolint"
   }
 }
