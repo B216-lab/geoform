@@ -49,11 +49,10 @@
     "vitest": "^3.2.1"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,mjs,cjs}": [
+    "*": [
       "deno fmt",
       "deno lint --fix"
     ],
-    "*.{json,md}": "deno fmt",
     "Dockerfile": "hadolint"
   }
 }

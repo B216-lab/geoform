@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { normalizeDraft, type DayMovementsFormValues } from "./schema.ts";
+import { type DayMovementsFormValues, normalizeDraft } from "./schema.ts";
 
 const STORAGE_KEY = "form";
 

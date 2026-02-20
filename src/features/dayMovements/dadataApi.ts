@@ -1,4 +1,8 @@
-import axios, { AxiosError, type AxiosRequestConfig, type AxiosResponse } from "axios";
+import axios, {
+  AxiosError,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+} from "axios";
 import type { DaDataAddressSuggestion } from "./addressUtils.ts";
 import { EnvKey, getEnvValue } from "../../lib/env.ts";
 

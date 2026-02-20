@@ -3,7 +3,7 @@ name: Publish Docker image
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
 
 env:
@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
-        
+
       - name: Lint Dockerfile
         uses: hadolint/hadolint-action@v3.1.0
         with:
@@ -56,4 +56,3 @@ jobs:
           build-args: |
             VITE_DADATA_KEY=${{ secrets.VITE_DADATA_KEY }}
             VITE_DADATA_API=${{ vars.VITE_DADATA_API }}
-

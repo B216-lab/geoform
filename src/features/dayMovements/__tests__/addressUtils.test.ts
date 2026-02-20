@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
+  type DaDataAddressSuggestion,
   simplifyAddress,
   validateAddressHasHouse,
-  type DaDataAddressSuggestion,
 } from "../addressUtils.ts";
 
 describe("simplifyAddress", () => {

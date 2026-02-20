@@ -6,5 +6,8 @@
     "test": "pnpm run test",
     "test:watch": "pnpm run test:watch",
     "install": "pnpm install"
+  },
+  "fmt": {
+    "exclude": ["pnpm-lock.yaml"]
   }
 }

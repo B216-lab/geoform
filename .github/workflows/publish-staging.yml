@@ -3,7 +3,7 @@ name: Publish to staging
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
 
 jobs:

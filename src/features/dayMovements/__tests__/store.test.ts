@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useDraftStore } from "../store.ts";
 import type { DayMovementsFormValues, MovementValues } from "../schema.ts";
 
