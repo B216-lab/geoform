@@ -1,0 +1,26 @@
+services:
+  frontend:
+    container_name: geoform-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_DADATA_KEY: ${VITE_DADATA_KEY:-test}
+        VITE_DADATA_API: ${VITE_DADATA_API:-http://suggestions.dadata.ru}
+    ports:
+      - "4173:4173"
+    restart: unless-stopped
+    environment:
+      - API_BASE_URL=${API_BASE_URL:-http://localhost:8081}
+    networks:
+      - shared-net
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:4173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  shared-net:
+    external: true

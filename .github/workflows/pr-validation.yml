@@ -1,0 +1,47 @@
+name: PR Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  pr-title:
+    uses: B216-lab/.github/.github/workflows/pr-title-validation.yml@main
+
+  docker-smoke:
+    name: Docker runtime smoke check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+
+      - name: Create network
+        run: docker network create shared-net
+
+      - name: Start stack
+        run: docker compose -f ci-compose.yml up -d --build
+
+      - name: Wait for app readiness
+        run: |
+          for i in {1..30}; do
+            if curl --fail --silent http://localhost:4173 > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose -f ci-compose.yml logs frontend
+          exit 1
+
+      - name: Tear down stack
+        if: always()
+        run: docker compose -f ci-compose.yml down -v
