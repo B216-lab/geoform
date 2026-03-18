@@ -9,6 +9,7 @@ jobs:
     uses: B216-lab/.github/.github/workflows/ssh-deploy.yml@main
     with:
       app_path: /opt/geoform
+      service_name: frontend
     secrets:
       DEPLOY_HOST: ${{ secrets.HOST }}
       DEPLOY_USERNAME: ${{ secrets.USERNAME }}
