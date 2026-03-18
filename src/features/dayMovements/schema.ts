@@ -179,7 +179,7 @@ export const dayMovementsSchema = () =>
     movementsDate: requiredStringSchema(),
     movements: z
       .array(movementSchema())
-      .min(1, i18n.t("validation.addAtLeastOneMovement"))
+      .min(2, i18n.t("validation.addAtLeastOneMovement"))
       .max(15),
   });
 

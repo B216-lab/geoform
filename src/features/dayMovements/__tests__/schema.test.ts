@@ -32,6 +32,21 @@ function validFormData(): DayMovementsFormValues {
         },
         comment: "",
       },
+      {
+        movementType: "ON_FOOT",
+        transport: [],
+        waitBetweenTransfersMinutes: 0,
+        departureTime: "17:00",
+        departurePlace: "WORKPLACE",
+        departureAddress: {
+          value: "ул. Карла Маркса, д. 5",
+          data: { geo_lat: "52.3", geo_lon: "104.3", house: "5" },
+        },
+        arrivalTime: "17:30",
+        arrivalPlace: "HOME_RESIDENCE",
+        arrivalAddress: null,
+        comment: "",
+      },
     ],
   };
 }
@@ -62,6 +77,13 @@ describe("dayMovementsSchema", () => {
   it("rejects empty movements array", () => {
     const data = validFormData();
     data.movements = [];
+    const result = dayMovementsSchema().safeParse(data);
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a single movement", () => {
+    const data = validFormData();
+    data.movements = [data.movements[0]!];
     const result = dayMovementsSchema().safeParse(data);
     expect(result.success).toBe(false);
   });

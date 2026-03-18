@@ -61,6 +61,19 @@ const PAGE0_FIELDS = [
 const toError = (message: unknown) =>
   typeof message === "string" ? message : undefined;
 
+const getMovementsArrayError = (
+  movementErrors: FieldErrors<DayMovementsFormValues>["movements"],
+): string | undefined => {
+  if (!movementErrors || typeof movementErrors !== "object") return undefined;
+
+  const maybeDirectMessage = (movementErrors as { message?: unknown }).message;
+  if (typeof maybeDirectMessage === "string") return maybeDirectMessage;
+
+  const maybeRoot = (movementErrors as { root?: { message?: unknown } }).root;
+  const maybeRootMessage = maybeRoot?.message;
+  return typeof maybeRootMessage === "string" ? maybeRootMessage : undefined;
+};
+
 const hasHouseNumber = (
   address: DaDataAddressSuggestion | null | undefined,
 ): boolean => !!address?.data?.house;
@@ -259,9 +272,11 @@ export function DayMovementsForm() {
 
   const onInvalidSubmit = useCallback(
     (formErrors: FieldErrors<DayMovementsFormValues>) => {
+      setSubmitError(null);
       const hasPage0Errors = PAGE0_FIELDS.some((fieldName) =>
         Boolean(formErrors[fieldName])
       );
+
       setStep(hasPage0Errors ? 0 : 1);
     },
     [],
@@ -269,6 +284,7 @@ export function DayMovementsForm() {
 
   const movementsDate = getValues("movementsDate");
   const isMovementsDateSet = Boolean(movementsDate);
+  const movementsError = getMovementsArrayError(errors.movements);
   const homeAddress = useWatch({ control, name: "homeAddress" }) as
     | DaDataAddressSuggestion
     | null
@@ -676,6 +692,8 @@ export function DayMovementsForm() {
                     )}
                   </>
                 )}
+
+                {movementsError && <Alert color="red">{movementsError}</Alert>}
 
                 {submitError && <Alert color="red">{submitError}</Alert>}
 
