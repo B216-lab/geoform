@@ -29,12 +29,13 @@
     "CHOKIDAR_USEPOLLING": "true",
     "COREPACK_ENABLE_STRICT": "0",
     "TMPDIR": "/tmp",
+    "API_BASE_URL": "http://localhost:8081",
     "PNPM_HOME": "/home/vscode/.local/share/pnpm/store"
   },
   "mounts": [
     "source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
   ],
-  "postAttachCommand": "sudo chown vscode:vscode node_modules && pnpm install --frozen-lockfile && pnpm run prepare && pnpm dev",
+  "postAttachCommand": "sudo chown vscode:vscode node_modules && pnpm install --frozen-lockfile && pnpm run prepare && mkdir -p public && envsubst < env.template.js > public/env.js && pnpm dev",
   "remoteUser": "vscode",
   "customizations": {
     "vscode": {

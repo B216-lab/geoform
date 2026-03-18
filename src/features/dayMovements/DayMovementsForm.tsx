@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Controller,
+  type FieldErrors,
   FormProvider,
   useFieldArray,
   useForm,
@@ -256,9 +257,15 @@ export function DayMovementsForm() {
     methods.reset(defaultFormValues as DayMovementsFormValues);
   }, [methods]);
 
-  if (isSubmitted) {
-    return <SuccessScreen onFillAnother={handleFillAnother} />;
-  }
+  const onInvalidSubmit = useCallback(
+    (formErrors: FieldErrors<DayMovementsFormValues>) => {
+      const hasPage0Errors = PAGE0_FIELDS.some((fieldName) =>
+        Boolean(formErrors[fieldName])
+      );
+      setStep(hasPage0Errors ? 0 : 1);
+    },
+    [],
+  );
 
   const movementsDate = getValues("movementsDate");
   const isMovementsDateSet = Boolean(movementsDate);
@@ -322,9 +329,13 @@ export function DayMovementsForm() {
     setValue,
   ]);
 
+  if (isSubmitted) {
+    return <SuccessScreen onFillAnother={handleFillAnother} />;
+  }
+
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <form onSubmit={handleSubmit(onSubmit, onInvalidSubmit)} noValidate>
         <Card withBorder radius="md" p="lg" shadow="xs">
           <Stepper
             active={step}
@@ -669,7 +680,11 @@ export function DayMovementsForm() {
                 {submitError && <Alert color="red">{submitError}</Alert>}
 
                 <Group justify="space-between">
-                  <Button variant="default" onClick={goToPreviousStep}>
+                  <Button
+                    type="button"
+                    variant="default"
+                    onClick={goToPreviousStep}
+                  >
                     {t("common.back")}
                   </Button>
                   <Button type="submit" loading={isSubmitting}>
