@@ -1,29 +1,16 @@
 name: Publish to staging
-
 on:
   push:
-    tags:
-      - "v*"
+    tags: ["v*"]
   workflow_dispatch:
 
 jobs:
-  build-and-push-image:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      attestations: write
-
-    steps:
-      - name: update docker image and restart
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          port: ${{ secrets.PORT }}
-          script: |
-            cd /opt/geoform
-            docker compose down frontend
-            docker compose pull frontend
-            docker compose up -d
+  deploy:
+    uses: B216-lab/.github/.github/workflows/ssh-deploy.yml@main
+    with:
+      app_path: /opt/umrs-back
+    secrets:
+      DEPLOY_HOST: ${{ secrets.HOST }}
+      DEPLOY_USERNAME: ${{ secrets.USERNAME }}
+      DEPLOY_KEY: ${{ secrets.KEY }}
+      DEPLOY_PORT: ${{ secrets.PORT }}

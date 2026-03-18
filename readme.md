@@ -17,4 +17,5 @@
 
 ## Contribution
 
-Look at [contributing.md](./.github/contributing.md)
+Look at
+[contributing.md](https://github.com/B216-lab/.github/blob/main/.github/contributing.md)
