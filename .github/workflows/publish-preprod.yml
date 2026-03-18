@@ -8,7 +8,7 @@ jobs:
   deploy:
     uses: B216-lab/.github/.github/workflows/ssh-deploy.yml@main
     with:
-      app_path: /opt/umrs-back
+      app_path: /opt/geoform
     secrets:
       DEPLOY_HOST: ${{ secrets.PREPROD_HOST }}
       DEPLOY_USERNAME: ${{ secrets.PREPROD_USERNAME }}
