@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { type DayMovementsFormValues, dayMovementsSchema } from "../schema.ts";
+import i18n from "../../../lib/i18n.ts";
 
 function validFormData(): DayMovementsFormValues {
   return {
@@ -79,5 +80,66 @@ describe("dayMovementsSchema", () => {
     data.movements[0]!.arrivalAddress = null;
     const result = dayMovementsSchema().safeParse(data);
     expect(result.success).toBe(false);
+  });
+
+  it("rejects HOME_RESIDENCE to non-home when addresses are identical", () => {
+    const data = validFormData();
+    data.movements[0]!.departurePlace = "HOME_RESIDENCE";
+    data.movements[0]!.departureAddress = {
+      value: "ул. Ленина, д. 1",
+      data: { geo_lat: "52.2978", geo_lon: "104.2964", house: "1" },
+    };
+    data.movements[0]!.arrivalPlace = "KINDERGARTEN";
+    data.movements[0]!.arrivalAddress = {
+      value: "ул. Ленина, д. 1",
+      data: { geo_lat: "52.2978", geo_lon: "104.2964", house: "1" },
+    };
+
+    const result = dayMovementsSchema().safeParse(data);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const addressEqualityIssue = result.error.issues.find((issue) =>
+        issue.path.join(".") === "movements.0.arrivalPlace"
+      );
+      expect(addressEqualityIssue?.message).toBe(
+        i18n.t("validation.departureArrivalAddressMustDiffer"),
+      );
+    }
+  });
+
+  it("allows HOME_RESIDENCE to non-home when addresses differ", () => {
+    const data = validFormData();
+    data.movements[0]!.departurePlace = "HOME_RESIDENCE";
+    data.movements[0]!.departureAddress = {
+      value: "ул. Ленина, д. 1",
+      data: { geo_lat: "52.2978", geo_lon: "104.2964", house: "1" },
+    };
+    data.movements[0]!.arrivalPlace = "KINDERGARTEN";
+    data.movements[0]!.arrivalAddress = {
+      value: "ул. Карла Маркса, д. 5",
+      data: { geo_lat: "52.3", geo_lon: "104.3", house: "5" },
+    };
+
+    const result = dayMovementsSchema().safeParse(data);
+    expect(result.success).toBe(true);
+  });
+
+  it("allows movement when coordinates match but addresses differ", () => {
+    const data = validFormData();
+    data.movements[0]!.departurePlace = "HOME_RESIDENCE";
+    data.movements[0]!.departureAddress = {
+      value: "ул. Ленина, д. 1",
+      unrestricted_value: "г Иркутск, ул Ленина, д 1",
+      data: { geo_lat: "52.2978", geo_lon: "104.2964", house: "1" },
+    };
+    data.movements[0]!.arrivalPlace = "DAYCARE_CENTER";
+    data.movements[0]!.arrivalAddress = {
+      value: "ул. Карла Маркса, д. 5",
+      unrestricted_value: "г Иркутск, ул Карла Маркса, д 5",
+      data: { geo_lat: "52.2978", geo_lon: "104.2964", house: "5" },
+    };
+
+    const result = dayMovementsSchema().safeParse(data);
+    expect(result.success).toBe(true);
   });
 });

@@ -128,6 +128,8 @@ const ruCommon = {
     selectAtLeastOneTransport: "Выберите хотя бы один тип транспорта",
     departureArrivalMustDiffer:
       "Пункт отправления и пункт прибытия не могут быть одинаковыми для одного передвижения",
+    departureArrivalAddressMustDiffer:
+      "Адреса отправления и прибытия не могут совпадать для одного передвижения",
     addAtLeastOneMovement: "Добавьте хотя бы одно передвижение",
   },
   errors: {

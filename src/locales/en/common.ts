@@ -129,6 +129,8 @@ const enCommon = {
     selectAtLeastOneTransport: "Select at least one transport type",
     departureArrivalMustDiffer:
       "Departure and arrival points cannot be the same for one movement",
+    departureArrivalAddressMustDiffer:
+      "Departure and arrival addresses cannot be the same for one movement",
     addAtLeastOneMovement: "Add at least one movement",
   },
   errors: {

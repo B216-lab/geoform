@@ -43,16 +43,16 @@ function isSameAddress(
 ): boolean {
   if (!left || !right) return false;
 
-  const leftLat = String(left.data?.geo_lat ?? "");
-  const leftLon = String(left.data?.geo_lon ?? "");
-  const rightLat = String(right.data?.geo_lat ?? "");
-  const rightLon = String(right.data?.geo_lon ?? "");
-  if (leftLat && leftLon && rightLat && rightLon) {
-    return leftLat === rightLat && leftLon === rightLon;
+  const leftHouseFiasId = String(left.data?.house_fias_id ?? "").trim();
+  const rightHouseFiasId = String(right.data?.house_fias_id ?? "").trim();
+  if (leftHouseFiasId && rightHouseFiasId) {
+    return leftHouseFiasId === rightHouseFiasId;
   }
 
-  const leftValue = left.value.trim().toLowerCase();
-  const rightValue = right.value.trim().toLowerCase();
+  const leftValue = String(left.unrestricted_value ?? left.value).trim()
+    .toLowerCase();
+  const rightValue = String(right.unrestricted_value ?? right.value).trim()
+    .toLowerCase();
   return !!leftValue && leftValue === rightValue;
 }
 
@@ -145,10 +145,16 @@ export const movementSchema = () =>
       data.arrivalAddress,
     );
 
-    if (sameHome || sameAddressPoint) {
+    if (sameHome) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: i18n.t("validation.departureArrivalMustDiffer"),
+        path: ["arrivalPlace"],
+      });
+    } else if (sameAddressPoint) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: i18n.t("validation.departureArrivalAddressMustDiffer"),
         path: ["arrivalPlace"],
       });
     }

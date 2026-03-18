@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { devtools } from "zustand/middleware";
 import { type DayMovementsFormValues, normalizeDraft } from "./schema.ts";
 
 const STORAGE_KEY = "form";
@@ -52,22 +53,36 @@ function writeToStorage(data: Partial<DayMovementsFormValues>): void {
   }
 }
 
-export const useDraftStore = create<DraftState>((set, get) => ({
-  draft: readFromStorage(),
-  lastSavedAt: null,
-  isRestored: Object.keys(readFromStorage()).length > 0,
+export const useDraftStore = create<DraftState>()(
+  devtools(
+    (set, get) => ({
+      draft: readFromStorage(),
+      lastSavedAt: null,
+      isRestored: Object.keys(readFromStorage()).length > 0,
 
-  saveDraft: (values) => {
-    writeToStorage(values);
-    set({ draft: values, lastSavedAt: new Date().toISOString() });
-  },
+      saveDraft: (values) => {
+        writeToStorage(values);
+        set(
+          { draft: values, lastSavedAt: new Date().toISOString() },
+          undefined,
+          "draft/saveDraft",
+        );
+      },
 
-  clearMovements: () => {
-    const current = get().draft;
-    const updated = { ...current, movements: undefined };
-    writeToStorage(updated);
-    set({ draft: updated });
-  },
+      clearMovements: () => {
+        const current = get().draft;
+        const updated = { ...current, movements: undefined };
+        writeToStorage(updated);
+        set({ draft: updated }, undefined, "draft/clearMovements");
+      },
 
-  markRestored: () => set({ isRestored: true }),
-}));
+      markRestored: () =>
+        set({ isRestored: true }, undefined, "draft/markRestored"),
+    }),
+    {
+      name: "DayMovementsDraftStore",
+      enabled: import.meta.env.DEV,
+      anonymousActionType: "draft/anonymous",
+    },
+  ),
+);
