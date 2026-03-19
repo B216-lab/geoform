@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import {
   alpha,
@@ -54,7 +53,6 @@ export function MovementItem({
 
   const {
     control,
-    setValue,
     formState: { errors },
   } = useFormContext<DayMovementsFormValues>();
 
@@ -69,16 +67,6 @@ export function MovementItem({
   const showPeopleInCar = transports.includes("CAR_SHARING") ||
     transports.includes("PRIVATE_CAR");
   const transportOptions = enumToOptions(Transport, t, "enums.transport");
-
-  useEffect(() => {
-    if (!movementType) {
-      setValue(`${prefix}.movementType`, "ON_FOOT", {
-        shouldDirty: false,
-        shouldTouch: false,
-        shouldValidate: true,
-      });
-    }
-  }, [movementType, prefix, setValue]);
 
   return (
     <Card withBorder radius="md" p="lg" shadow="xs">

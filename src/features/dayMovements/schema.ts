@@ -291,7 +291,10 @@ export function normalizeDraft(
 
   normalized.movements = chainMovements(
     normalized.movements as MovementValues[],
-  );
+  ).map((movement) => ({
+    ...movement,
+    movementType: movement.movementType ?? "ON_FOOT",
+  }));
   return normalized;
 }
 
