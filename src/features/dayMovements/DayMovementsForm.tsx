@@ -1,38 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Alert,
-  Button,
-  Card,
-  Grid,
-  Group,
-  NumberInput,
-  Select,
-  Stack,
-  Stepper,
-  Text,
-  TextInput,
-  Timeline,
-} from "@mantine/core";
-import { TimePicker } from "@mantine/dates";
-import { IconClockHour3, IconMapPin } from "@tabler/icons-react";
+import { Card, Stack, Stepper } from "@mantine/core";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Controller,
-  type FieldErrors,
-  FormProvider,
-  useFieldArray,
-  useForm,
-  useWatch,
-} from "react-hook-form";
+import { type FieldErrors, FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { SuccessScreen } from "../../components/SuccessScreen.tsx";
-import { AddressAutocomplete } from "../../components/ui/AddressAutocomplete.tsx";
 import { ApiHttpError, ApiNetworkError } from "../../lib/api.ts";
-import { ArrivalPointItem } from "./ArrivalPointItem.tsx";
 import type { DaDataAddressSuggestion } from "./addressUtils.ts";
 import { enumToOptions, Gender, Place, SocialStatus } from "./enums.ts";
 import { submitDayMovementsForm } from "./formSubmission.ts";
-import { MovementItem } from "./MovementItem.tsx";
+import { GeneralInfoStep } from "./GeneralInfoStep.tsx";
+import { MovementsStep } from "./MovementsStep.tsx";
 import {
   buildNextMovementFromPrevious,
   chainMovements,
@@ -57,8 +34,6 @@ const PAGE0_FIELDS = [
   "incomeMin",
   "incomeMax",
 ] as const;
-
-const toError = (message: unknown) => (typeof message === "string" ? message : undefined);
 
 const getMovementsArrayError = (
   movementErrors: FieldErrors<DayMovementsFormValues>["movements"],
@@ -134,7 +109,6 @@ export function DayMovementsForm() {
   });
 
   const {
-    register,
     handleSubmit,
     control,
     trigger,
@@ -317,325 +291,49 @@ export function DayMovementsForm() {
 
           <Stack mt="lg" gap="md">
             {step === 0 && (
-              <>
-                <Grid gutter="md">
-                  <Grid.Col span={{ base: 12, sm: 4 }}>
-                    <TextInput
-                      type="date"
-                      min="1956-12-01"
-                      max="2018-12-01"
-                      label={t("form.birthday")}
-                      error={toError(errors.birthday?.message)}
-                      {...register("birthday", {
-                        onChange: () => {
-                          void trigger("birthday");
-                        },
-                      })}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={{ base: 12, sm: 4 }}>
-                    <Controller
-                      control={control}
-                      name="gender"
-                      render={({ field }) => (
-                        <Select
-                          label={t("form.gender")}
-                          data={genderOptions}
-                          value={field.value ?? null}
-                          onChange={(value) => {
-                            field.onChange(value);
-                            void trigger("gender");
-                          }}
-                          searchable
-                          error={toError(errors.gender?.message)}
-                        />
-                      )}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={{ base: 12, sm: 4 }}>
-                    <Controller
-                      control={control}
-                      name="socialStatus"
-                      render={({ field }) => (
-                        <Select
-                          label={t("form.socialStatus")}
-                          data={socialStatusOptions}
-                          value={field.value ?? null}
-                          onChange={(value) => {
-                            field.onChange(value);
-                            void trigger("socialStatus");
-                          }}
-                          searchable
-                          error={toError(errors.socialStatus?.message)}
-                        />
-                      )}
-                    />
-                  </Grid.Col>
-                </Grid>
-
-                <Controller
-                  control={control}
-                  name="homeAddress"
-                  render={({ field }) => (
-                    <AddressAutocomplete
-                      value={field.value as DaDataAddressSuggestion | null}
-                      onChange={(val) => {
-                        field.onChange(val as DayMovementsFormValues["homeAddress"]);
-                        void trigger("homeAddress");
-                      }}
-                      getAddressItems={getAddressItems}
-                      delay={ADDRESS_DELAY}
-                      minChars={DEFAULT_MIN_CHARS}
-                      label={t("form.homeAddress")}
-                      description={t("form.homeAddressDescription")}
-                      error={toError(errors.homeAddress?.message)}
-                    />
-                  )}
-                />
-
-                <Stack gap="xs">
-                  <Text fw={600}>
-                    {t("form.transportCostsTitle", {
-                      period: t("common.currencyPerMonth"),
-                    })}
-                  </Text>
-                  <Grid>
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
-                      <Controller
-                        control={control}
-                        name="transportCostMin"
-                        render={({ field }) => (
-                          <NumberInput
-                            label={t("common.min")}
-                            min={0}
-                            max={20000}
-                            leftSection="₽"
-                            value={field.value ?? 0}
-                            onChange={field.onChange}
-                            error={toError(errors.transportCostMin?.message)}
-                          />
-                        )}
-                      />
-                    </Grid.Col>
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
-                      <Controller
-                        control={control}
-                        name="transportCostMax"
-                        render={({ field }) => (
-                          <NumberInput
-                            label={t("common.max")}
-                            min={0}
-                            max={20000}
-                            leftSection="₽"
-                            value={field.value ?? 3000}
-                            onChange={field.onChange}
-                            error={toError(errors.transportCostMax?.message)}
-                          />
-                        )}
-                      />
-                    </Grid.Col>
-                  </Grid>
-                </Stack>
-
-                <Stack gap="xs">
-                  <Text fw={600}>
-                    {t("form.incomeTitle", {
-                      period: t("common.currencyPerMonth"),
-                    })}
-                  </Text>
-                  <Grid>
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
-                      <Controller
-                        control={control}
-                        name="incomeMin"
-                        render={({ field }) => (
-                          <NumberInput
-                            label={t("common.min")}
-                            min={0}
-                            max={250000}
-                            leftSection="₽"
-                            value={field.value ?? 0}
-                            onChange={field.onChange}
-                            error={toError(errors.incomeMin?.message)}
-                          />
-                        )}
-                      />
-                    </Grid.Col>
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
-                      <Controller
-                        control={control}
-                        name="incomeMax"
-                        render={({ field }) => (
-                          <NumberInput
-                            label={t("common.max")}
-                            min={0}
-                            max={250000}
-                            leftSection="₽"
-                            value={field.value ?? 50000}
-                            onChange={field.onChange}
-                            error={toError(errors.incomeMax?.message)}
-                          />
-                        )}
-                      />
-                    </Grid.Col>
-                  </Grid>
-                </Stack>
-
-                <Group justify="flex-end">
-                  <Button onClick={goToNextStep}>{t("common.next")}</Button>
-                </Group>
-              </>
+              <GeneralInfoStep
+                genderOptions={genderOptions}
+                socialStatusOptions={socialStatusOptions}
+                getAddressItems={getAddressItems}
+                addressDelay={ADDRESS_DELAY}
+                addressMinChars={DEFAULT_MIN_CHARS}
+                onNext={goToNextStep}
+              />
             )}
 
             {step === 1 && (
-              <>
-                <TextInput
-                  type="date"
-                  label={t("form.movementsDate")}
-                  withAsterisk
-                  description={t("form.movementsDateDescription")}
-                  max={movementsDateMax}
-                  error={toError(errors.movementsDate?.message)}
-                  {...register("movementsDate")}
-                />
-
-                {isMovementsDateSet && (
-                  <>
-                    <Timeline bulletSize={24} lineWidth={2} active={Math.max(fields.length, 0)}>
-                      <Timeline.Item bullet={<IconMapPin size={12} />}>
-                        <Card withBorder radius="md" p="md">
-                          <Stack gap="sm">
-                            <Text fw={600}>{t("form.departure")}</Text>
-                            <Grid>
-                              <Grid.Col span={{ base: 12, sm: 4 }}>
-                                <Controller
-                                  control={control}
-                                  name="movements.0.departureTime"
-                                  render={({ field }) => (
-                                    <TimePicker
-                                      label={t("form.time")}
-                                      withAsterisk
-                                      value={field.value ?? ""}
-                                      onChange={field.onChange}
-                                      format="24h"
-                                      withSeconds={false}
-                                      leftSection={<IconClockHour3 size={16} />}
-                                      error={toError(errors.movements?.[0]?.departureTime?.message)}
-                                    />
-                                  )}
-                                />
-                              </Grid.Col>
-                              <Grid.Col span={{ base: 12, sm: 8 }}>
-                                <Controller
-                                  control={control}
-                                  name="movements.0.departurePlace"
-                                  render={({ field }) => (
-                                    <Select
-                                      label={t("form.point")}
-                                      withAsterisk
-                                      data={placeOptions}
-                                      searchable
-                                      value={field.value ?? null}
-                                      onChange={field.onChange}
-                                      error={toError(
-                                        errors.movements?.[0]?.departurePlace?.message,
-                                      )}
-                                    />
-                                  )}
-                                />
-                              </Grid.Col>
-                            </Grid>
-                            <Controller
-                              control={control}
-                              name="movements.0.departureAddress"
-                              render={({ field }) => (
-                                <AddressAutocomplete
-                                  value={field.value as DaDataAddressSuggestion | null}
-                                  onChange={field.onChange}
-                                  getAddressItems={getAddressItems}
-                                  delay={ADDRESS_DELAY}
-                                  minChars={DEFAULT_MIN_CHARS}
-                                  disabled={startDeparturePlace === "HOME_RESIDENCE"}
-                                  label={t("form.address")}
-                                  withAsterisk
-                                  description={
-                                    startDeparturePlace === "HOME_RESIDENCE"
-                                      ? t("form.homeAddressAutofill")
-                                      : t("form.homeAddressDescription")
-                                  }
-                                  error={toError(errors.movements?.[0]?.departureAddress?.message)}
-                                />
-                              )}
-                            />
-                          </Stack>
-                        </Card>
-                      </Timeline.Item>
-
-                      {isFirstDepartureReady &&
-                        fields.flatMap((field, index) => {
-                          const previousPlaceLabel =
-                            index === 0
-                              ? getPlaceLabel(timelineStartPoint.departurePlace)
-                              : getPlaceLabel(movements?.[index - 1]?.arrivalPlace);
-                          const previousAddressLabel =
-                            index === 0
-                              ? (timelineStartPoint.departureAddress?.value ?? null)
-                              : (movements?.[index - 1]?.arrivalAddress?.value ?? null);
-
-                          const items = [
-                            <Timeline.Item key={field.id}>
-                              <MovementItem
-                                index={index}
-                                onRemove={() => remove(index)}
-                                canRemove={fields.length > 1}
-                                previousPlaceLabel={previousPlaceLabel}
-                                previousAddressLabel={previousAddressLabel}
-                              />
-                            </Timeline.Item>,
-                          ];
-
-                          if (isMovementLegReady(chainedMovements[index])) {
-                            items.push(
-                              <Timeline.Item
-                                key={`${field.id}-arrival`}
-                                bullet={<IconMapPin size={12} />}
-                              >
-                                <ArrivalPointItem
-                                  index={index}
-                                  homeAddress={homeAddress ?? null}
-                                  getAddressItems={getAddressItems}
-                                  addressDelay={ADDRESS_DELAY}
-                                  addressMinChars={DEFAULT_MIN_CHARS}
-                                />
-                              </Timeline.Item>,
-                            );
-                          }
-
-                          return items;
-                        })}
-                    </Timeline>
-
-                    {isFirstDepartureReady && canAddMovement && (
-                      <Button variant="light" onClick={addMovementIfPreviousValid}>
-                        {t("form.addMovement")}
-                      </Button>
-                    )}
-                  </>
-                )}
-
-                {movementsError && <Alert color="red">{movementsError}</Alert>}
-
-                {submitError && <Alert color="red">{submitError}</Alert>}
-
-                <Group justify="space-between">
-                  <Button type="button" variant="default" onClick={goToPreviousStep}>
-                    {t("common.back")}
-                  </Button>
-                  <Button type="submit" loading={isSubmitting}>
-                    {t("common.finish")}
-                  </Button>
-                </Group>
-              </>
+              <MovementsStep
+                placeOptions={placeOptions}
+                timeline={{
+                  movementsDateMax,
+                  isMovementsDateSet,
+                  fields,
+                  movements: movements as MovementValues[] | undefined,
+                  chainedMovements,
+                  timelineStartPoint,
+                  isFirstDepartureReady,
+                  canAddMovement,
+                  startDeparturePlace,
+                  homeAddress,
+                }}
+                addressConfig={{
+                  getAddressItems,
+                  delay: ADDRESS_DELAY,
+                  minChars: DEFAULT_MIN_CHARS,
+                }}
+                actions={{
+                  onAddMovement: addMovementIfPreviousValid,
+                  onRemoveMovement: remove,
+                  onBack: goToPreviousStep,
+                  getPlaceLabel,
+                  isMovementLegReady,
+                }}
+                status={{
+                  movementsError,
+                  submitError,
+                  isSubmitting,
+                }}
+              />
             )}
           </Stack>
         </Card>
