@@ -17,9 +17,7 @@ export const daDataAddressSchema = () =>
     },
   );
 
-export type DaDataAddressValue = z.infer<
-  ReturnType<typeof daDataAddressSchema>
->;
+export type DaDataAddressValue = z.infer<ReturnType<typeof daDataAddressSchema>>;
 
 const requiredStringSchema = () =>
   z
@@ -49,9 +47,11 @@ function isSameAddress(
     return leftHouseFiasId === rightHouseFiasId;
   }
 
-  const leftValue = String(left.unrestricted_value ?? left.value).trim()
+  const leftValue = String(left.unrestricted_value ?? left.value)
+    .trim()
     .toLowerCase();
-  const rightValue = String(right.unrestricted_value ?? right.value).trim()
+  const rightValue = String(right.unrestricted_value ?? right.value)
+    .trim()
     .toLowerCase();
   return !!leftValue && leftValue === rightValue;
 }
@@ -65,100 +65,99 @@ const addressWithHouseSchema = () =>
  * A single movement entry within the day.
  */
 export const movementSchema = () =>
-  z.object({
-    movementType: z.enum(["ON_FOOT", "TRANSPORT"]),
+  z
+    .object({
+      movementType: z.enum(["ON_FOOT", "TRANSPORT"]),
 
-    // Transport-specific (required when movementType === "TRANSPORT")
-    transport: z.array(z.string()).optional(),
-    numberPeopleInCar: z.coerce.number().int().min(1).max(15).optional(),
-    walkToStartMinutes: z.coerce.number().int().min(0).max(180).optional(),
-    waitAtStartMinutes: z.coerce.number().int().min(0).max(180).optional(),
-    numberOfTransfers: z.coerce.number().int().min(0).max(15).optional(),
-    waitBetweenTransfersMinutes: z.coerce.number().int().min(0).max(180),
+      // Transport-specific (required when movementType === "TRANSPORT")
+      transport: z.array(z.string()).optional(),
+      numberPeopleInCar: z.coerce.number().int().min(1).max(15).optional(),
+      walkToStartMinutes: z.coerce.number().int().min(0).max(180).optional(),
+      waitAtStartMinutes: z.coerce.number().int().min(0).max(180).optional(),
+      numberOfTransfers: z.coerce.number().int().min(0).max(15).optional(),
+      waitBetweenTransfersMinutes: z.coerce.number().int().min(0).max(180),
 
-    // Departure
-    departureTime: requiredStringSchema(),
-    departurePlace: requiredStringSchema(),
-    departureAddress: daDataAddressSchema().nullable().optional(),
+      // Departure
+      departureTime: requiredStringSchema(),
+      departurePlace: requiredStringSchema(),
+      departureAddress: daDataAddressSchema().nullable().optional(),
 
-    // Arrival
-    arrivalTime: requiredStringSchema(),
-    arrivalPlace: requiredStringSchema(),
-    arrivalAddress: daDataAddressSchema().nullable().optional(),
+      // Arrival
+      arrivalTime: requiredStringSchema(),
+      arrivalPlace: requiredStringSchema(),
+      arrivalAddress: daDataAddressSchema().nullable().optional(),
 
-    // Transport arrival extras
-    walkFromFinishMinutes: z.coerce.number().int().min(0).max(180).optional(),
-    tripCost: z.coerce.number().int().min(0).max(25000).nullable().optional(),
+      // Transport arrival extras
+      walkFromFinishMinutes: z.coerce.number().int().min(0).max(180).optional(),
+      tripCost: z.coerce.number().int().min(0).max(25000).nullable().optional(),
 
-    comment: z.string().max(2000).optional(),
-  }).superRefine((data, ctx) => {
-    // Conditional: transport fields required when movementType is TRANSPORT
-    if (data.movementType === "TRANSPORT") {
-      if (!data.transport || data.transport.length === 0) {
+      comment: z.string().max(2000).optional(),
+    })
+    .superRefine((data, ctx) => {
+      // Conditional: transport fields required when movementType is TRANSPORT
+      if (data.movementType === "TRANSPORT") {
+        if (!data.transport || data.transport.length === 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: i18n.t("validation.selectAtLeastOneTransport"),
+            path: ["transport"],
+          });
+        }
+      }
+
+      // Conditional: departureAddress required unless departurePlace is HOME_RESIDENCE
+      if (data.departurePlace !== "HOME_RESIDENCE") {
+        if (!data.departureAddress) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: i18n.t("validation.required"),
+            path: ["departureAddress"],
+          });
+        } else if (!hasHouseNumber(data.departureAddress)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: i18n.t("validation.addressMustContainHouse"),
+            path: ["departureAddress"],
+          });
+        }
+      }
+
+      // Conditional: arrivalAddress required unless arrivalPlace is HOME_RESIDENCE
+      if (data.arrivalPlace !== "HOME_RESIDENCE") {
+        if (!data.arrivalAddress) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: i18n.t("validation.required"),
+            path: ["arrivalAddress"],
+          });
+        } else if (!hasHouseNumber(data.arrivalAddress)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: i18n.t("validation.addressMustContainHouse"),
+            path: ["arrivalAddress"],
+          });
+        }
+      }
+
+      // Prevent zero-distance movement: home -> home or same address twice in a row.
+      const sameHome =
+        data.departurePlace === "HOME_RESIDENCE" && data.arrivalPlace === "HOME_RESIDENCE";
+      const sameAddressPoint = isSameAddress(data.departureAddress, data.arrivalAddress);
+
+      if (sameHome) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: i18n.t("validation.selectAtLeastOneTransport"),
-          path: ["transport"],
+          message: i18n.t("validation.departureArrivalMustDiffer"),
+          path: ["arrivalPlace"],
+        });
+      } else if (sameAddressPoint) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: i18n.t("validation.departureArrivalAddressMustDiffer"),
+          path: ["arrivalPlace"],
         });
       }
-    }
-
-    // Conditional: departureAddress required unless departurePlace is HOME_RESIDENCE
-    if (data.departurePlace !== "HOME_RESIDENCE") {
-      if (!data.departureAddress) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: i18n.t("validation.required"),
-          path: ["departureAddress"],
-        });
-      } else if (!hasHouseNumber(data.departureAddress)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: i18n.t("validation.addressMustContainHouse"),
-          path: ["departureAddress"],
-        });
-      }
-    }
-
-    // Conditional: arrivalAddress required unless arrivalPlace is HOME_RESIDENCE
-    if (data.arrivalPlace !== "HOME_RESIDENCE") {
-      if (!data.arrivalAddress) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: i18n.t("validation.required"),
-          path: ["arrivalAddress"],
-        });
-      } else if (!hasHouseNumber(data.arrivalAddress)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: i18n.t("validation.addressMustContainHouse"),
-          path: ["arrivalAddress"],
-        });
-      }
-    }
-
-    // Prevent zero-distance movement: home -> home or same address twice in a row.
-    const sameHome = data.departurePlace === "HOME_RESIDENCE" &&
-      data.arrivalPlace === "HOME_RESIDENCE";
-    const sameAddressPoint = isSameAddress(
-      data.departureAddress,
-      data.arrivalAddress,
-    );
-
-    if (sameHome) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: i18n.t("validation.departureArrivalMustDiffer"),
-        path: ["arrivalPlace"],
-      });
-    } else if (sameAddressPoint) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: i18n.t("validation.departureArrivalAddressMustDiffer"),
-        path: ["arrivalPlace"],
-      });
-    }
-  });
+    });
 
 /**
  * Top-level form schema for the DayMovements form.
@@ -177,15 +176,10 @@ export const dayMovementsSchema = () =>
 
     // Page 1 — movements
     movementsDate: requiredStringSchema(),
-    movements: z
-      .array(movementSchema())
-      .min(2, i18n.t("validation.addAtLeastOneMovement"))
-      .max(15),
+    movements: z.array(movementSchema()).min(2, i18n.t("validation.addAtLeastOneMovement")).max(15),
   });
 
-export type DayMovementsFormValues = z.infer<
-  ReturnType<typeof dayMovementsSchema>
->;
+export type DayMovementsFormValues = z.infer<ReturnType<typeof dayMovementsSchema>>;
 export type MovementValues = z.infer<ReturnType<typeof movementSchema>>;
 
 export interface TimelineStartPoint {
@@ -230,9 +224,7 @@ export const defaultFormValues: Partial<DayMovementsFormValues> = {
 /**
  * Extracts start point values from the first movement.
  */
-export function getTimelineStartPoint(
-  movements: MovementValues[] | undefined,
-): TimelineStartPoint {
+export function getTimelineStartPoint(movements: MovementValues[] | undefined): TimelineStartPoint {
   const first = movements?.[0];
   return {
     departureTime: first?.departureTime ?? "",
@@ -244,9 +236,7 @@ export function getTimelineStartPoint(
 /**
  * Creates a new movement linked from a previous arrival point.
  */
-export function buildNextMovementFromPrevious(
-  previous: MovementValues,
-): MovementValues {
+export function buildNextMovementFromPrevious(previous: MovementValues): MovementValues {
   return {
     ...(defaultMovement as MovementValues),
     departureTime: previous.arrivalTime ?? "",
@@ -259,9 +249,7 @@ export function buildNextMovementFromPrevious(
  * Ensures departure fields are linearly chained:
  * movement[i].departure = movement[i - 1].arrival for i > 0.
  */
-export function chainMovements(
-  movements: MovementValues[] | undefined,
-): MovementValues[] {
+export function chainMovements(movements: MovementValues[] | undefined): MovementValues[] {
   if (!movements || movements.length === 0) {
     return [{ ...defaultMovement } as MovementValues];
   }
@@ -289,21 +277,19 @@ export function normalizeDraft(
     return normalized;
   }
 
-  normalized.movements = chainMovements(
-    normalized.movements as MovementValues[],
-  ).map((movement) => ({
-    ...movement,
-    movementType: movement.movementType ?? "ON_FOOT",
-  }));
+  normalized.movements = chainMovements(normalized.movements as MovementValues[]).map(
+    (movement) => ({
+      ...movement,
+      movementType: movement.movementType ?? "ON_FOOT",
+    }),
+  );
   return normalized;
 }
 
 /**
  * Maps timeline-edited form data to payload with guaranteed movement chaining.
  */
-export function mapTimelineFormToPayload(
-  data: DayMovementsFormValues,
-): DayMovementsFormValues {
+export function mapTimelineFormToPayload(data: DayMovementsFormValues): DayMovementsFormValues {
   return {
     ...data,
     movements: chainMovements(data.movements as MovementValues[]),

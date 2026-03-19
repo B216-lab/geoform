@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react";
-import { fetchDaDataSuggestionsAddress } from "./dadataApi.ts";
 import type { DaDataAddressSuggestion } from "./addressUtils.ts";
+import { fetchDaDataSuggestionsAddress } from "./dadataApi.ts";
 
 const DEFAULT_ADDRESS_DELAY = 1000;
 const DEFAULT_MIN_CHARS = 3;
@@ -28,24 +28,17 @@ export function useDaDataAddress(minChars: number = DEFAULT_MIN_CHARS) {
       }
 
       try {
-        const { suggestions } = await fetchDaDataSuggestionsAddress(
-          controller.signal,
-          { query: searchQuery },
-        );
+        const { suggestions } = await fetchDaDataSuggestionsAddress(controller.signal, {
+          query: searchQuery,
+        });
 
-        if (
-          controller.signal.aborted ||
-          currentQueryRef.current !== searchQuery
-        ) {
+        if (controller.signal.aborted || currentQueryRef.current !== searchQuery) {
           return [];
         }
 
         return suggestions ?? [];
       } catch (err) {
-        if (
-          controller.signal.aborted ||
-          currentQueryRef.current !== searchQuery
-        ) {
+        if (controller.signal.aborted || currentQueryRef.current !== searchQuery) {
           return [];
         }
         console.error("[DaData] Error while fetching suggestions", err);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { type DayMovementsFormValues, dayMovementsSchema } from "../schema.ts";
 import i18n from "../../../lib/i18n.ts";
+import { type DayMovementsFormValues, dayMovementsSchema } from "../schema.ts";
 
 function validFormData(): DayMovementsFormValues {
   return {
@@ -120,8 +120,8 @@ describe("dayMovementsSchema", () => {
     const result = dayMovementsSchema().safeParse(data);
     expect(result.success).toBe(false);
     if (!result.success) {
-      const addressEqualityIssue = result.error.issues.find((issue) =>
-        issue.path.join(".") === "movements.0.arrivalPlace"
+      const addressEqualityIssue = result.error.issues.find(
+        (issue) => issue.path.join(".") === "movements.0.arrivalPlace",
       );
       expect(addressEqualityIssue?.message).toBe(
         i18n.t("validation.departureArrivalAddressMustDiffer"),

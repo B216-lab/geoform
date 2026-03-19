@@ -1,5 +1,5 @@
-import { getApiBaseUrl } from "./runtimeConfig.ts";
 import i18n from "./i18n.ts";
+import { getApiBaseUrl } from "./runtimeConfig.ts";
 
 /**
  * Network-level error (server unreachable, timeout, etc.).
@@ -32,19 +32,12 @@ export class ApiHttpError extends Error {
  * Performs a fetch request to the API.
  * Automatically prepends the base URL and includes cookies.
  */
-export async function apiFetch(
-  path: string,
-  options: RequestInit = {},
-): Promise<Response> {
+export async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const url = path.startsWith("http") ? path : `${getApiBaseUrl()}${path}`;
 
   const headers = new Headers(options.headers || {});
 
-  if (
-    options.body &&
-    !headers.has("Content-Type") &&
-    typeof options.body === "string"
-  ) {
+  if (options.body && !headers.has("Content-Type") && typeof options.body === "string") {
     headers.set("Content-Type", "application/json");
   }
 
@@ -56,9 +49,10 @@ export async function apiFetch(
       credentials: "include",
     });
   } catch (error) {
-    const errorMessage = error instanceof TypeError
-      ? i18n.t("errors.networkConnectWithHint")
-      : i18n.t("errors.networkGeneric");
+    const errorMessage =
+      error instanceof TypeError
+        ? i18n.t("errors.networkConnectWithHint")
+        : i18n.t("errors.networkGeneric");
     throw new ApiNetworkError(errorMessage, error);
   }
 

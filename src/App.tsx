@@ -1,4 +1,3 @@
-import { DayMovementsForm } from "./features/dayMovements/DayMovementsForm.tsx";
 import {
   ActionIcon,
   AppShell,
@@ -11,6 +10,7 @@ import {
 } from "@mantine/core";
 import { IconMoon, IconSun } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
+import { DayMovementsForm } from "./features/dayMovements/DayMovementsForm.tsx";
 
 export default function App() {
   const { setColorScheme } = useMantineColorScheme();
@@ -53,9 +53,7 @@ export default function App() {
                 variant="light"
                 size="lg"
                 onClick={toggleColorScheme}
-                aria-label={isDark
-                  ? t("app.switchToLight")
-                  : t("app.switchToDark")}
+                aria-label={isDark ? t("app.switchToLight") : t("app.switchToDark")}
                 title={isDark ? t("app.lightTheme") : t("app.darkTheme")}
               >
                 {isDark ? <IconSun size={18} /> : <IconMoon size={18} />}

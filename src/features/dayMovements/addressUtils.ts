@@ -34,7 +34,7 @@ export function simplifyAddress(
     const lat = parseFloat(data.geo_lat);
     const lon = parseFloat(data.geo_lon);
 
-    if (!isNaN(lat) && !isNaN(lon)) {
+    if (!Number.isNaN(lat) && !Number.isNaN(lon)) {
       return {
         value: suggestion.value || "",
         latitude: lat,

@@ -1,12 +1,4 @@
-import {
-  Button,
-  Card,
-  Center,
-  Stack,
-  Text,
-  ThemeIcon,
-  Title,
-} from "@mantine/core";
+import { Button, Card, Center, Stack, Text, ThemeIcon, Title } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 
 interface SuccessScreenProps {
@@ -37,10 +29,7 @@ export function SuccessScreen({ onFillAnother }: SuccessScreenProps) {
               {t("success.message")}
             </Text>
           </Stack>
-          <Button
-            onClick={onFillAnother}
-            data-testid="fill-another-form-button"
-          >
+          <Button onClick={onFillAnother} data-testid="fill-another-form-button">
             {t("success.fillAnother")}
           </Button>
         </Stack>

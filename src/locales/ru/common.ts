@@ -60,8 +60,7 @@ const ruCommon = {
   },
   arrival: {
     title: "Точка маршрута {{index}}",
-    walkFromFinish:
-      "Пешком от конечной остановки / парковки до места прибытия, мин",
+    walkFromFinish: "Пешком от конечной остановки / парковки до места прибытия, мин",
     tripCost: "Стоимость поездки / парковки, ₽",
     comment: "Комментарий",
     commentDescription: "Особенности маршрута, проблемы, пожелания...",
@@ -96,8 +95,7 @@ const ruCommon = {
       COLLEGE_TECHNICAL_SCHOOL: "колледж / техникум / училище",
       UNIVERSITY_INSTITUTE: "университет / институт",
       HOSPITAL_CLINIC: "больница / поликлиника",
-      CULTURAL_INSTITUTION:
-        "учреждение культуры (музей, театр, цирк, библиотека и т.п.)",
+      CULTURAL_INSTITUTION: "учреждение культуры (музей, театр, цирк, библиотека и т.п.)",
       SPORT_FITNESS: "спорт / фитнес",
       STORE_MARKET: "магазин / рынок",
       SHOPPING_ENTERTAINMENT_CENTER: "торгово - развлекательный центр",
@@ -107,8 +105,7 @@ const ruCommon = {
     },
     transport: {
       BICYCLE: "велосипед",
-      INDIVIDUAL_MOBILITY:
-        "средства индивидуальной мобильности (самокат и пр.)",
+      INDIVIDUAL_MOBILITY: "средства индивидуальной мобильности (самокат и пр.)",
       BUS: "автобус",
       SHUTTLE_TAXI: "маршрутное такси",
       TRAM: "трамвай",
@@ -137,8 +134,7 @@ const ruCommon = {
     submitUnexpected: "Произошла ошибка при отправке формы.",
     networkConnect: "Не удалось подключиться к серверу.",
     networkSend: "Ошибка сети при отправке формы.",
-    networkConnectWithHint:
-      "Не удалось подключиться к серверу. Проверьте, что сервер запущен.",
+    networkConnectWithHint: "Не удалось подключиться к серверу. Проверьте, что сервер запущен.",
     networkGeneric: "Ошибка сети при подключении к серверу.",
     serverErrorWithStatus: "Ошибка сервера: {{status}} {{statusText}}",
     badRequest: "Неверные данные формы. Проверьте заполненные поля.",

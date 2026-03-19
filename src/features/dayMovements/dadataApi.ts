@@ -1,10 +1,6 @@
-import axios, {
-  AxiosError,
-  type AxiosRequestConfig,
-  type AxiosResponse,
-} from "axios";
-import type { DaDataAddressSuggestion } from "./addressUtils.ts";
+import axios, { AxiosError, type AxiosRequestConfig, type AxiosResponse } from "axios";
 import { EnvKey, getEnvValue } from "../../lib/env.ts";
+import type { DaDataAddressSuggestion } from "./addressUtils.ts";
 
 const API_KEY = getEnvValue(EnvKey.DaDataApiKey);
 const API_URL = getEnvValue(EnvKey.DaDataApiUrl);

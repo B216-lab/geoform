@@ -2,49 +2,39 @@
   "name": "geoform",
   "image": "mcr.microsoft.com/devcontainers/base:debian",
   "features": {
+    "ghcr.io/shyim/devcontainers-features/bun:0": {
+      "version": "1.3.11"
+    },
     "ghcr.io/devcontainers/features/node:1": {
       "version": "25"
     },
-    "ghcr.io/devcontainers-community/features/deno:1": {
-      "version": "2.6.5"
-    },
     "ghcr.io/dhoeric/features/hadolint:1": {}
   },
-  "forwardPorts": [
-    5173
-  ],
+  "forwardPorts": [5173],
   "portsAttributes": {
     "5173": {
       "label": "Vite app"
     }
   },
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-  "runArgs": [
-    "--init",
-    "--network",
-    "shared-net"
-  ],
+  "runArgs": ["--init", "--network", "shared-net"],
   "containerEnv": {
     "NODE_ENV": "development",
     "CHOKIDAR_USEPOLLING": "true",
-    "COREPACK_ENABLE_STRICT": "0",
     "TMPDIR": "/tmp",
-    "API_BASE_URL": "http://localhost:8081",
-    "PNPM_HOME": "/home/vscode/.local/share/pnpm/store"
+    "API_BASE_URL": "http://localhost:8081"
   },
   "mounts": [
     "source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
   ],
-  "postAttachCommand": "sudo chown vscode:vscode node_modules && pnpm install --frozen-lockfile && pnpm run prepare && mkdir -p public && envsubst < env.template.js > public/env.js && pnpm dev",
+  "postAttachCommand": "sudo chown vscode:vscode node_modules && bun install --frozen-lockfile && bun run prepare && mkdir -p public && envsubst < env.template.js > public/env.js && bun dev",
   "remoteUser": "vscode",
   "customizations": {
     "vscode": {
-      "extensions": [
-        "denoland.vscode-deno",
-        "exiasr.hadolint"
-      ],
+      "extensions": ["biomejs.biome", "exiasr.hadolint"],
       "settings": {
-        "editor.formatOnSave": true
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "biomejs.biome"
       }
     }
   }

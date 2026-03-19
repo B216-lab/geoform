@@ -21,8 +21,7 @@ const enCommon = {
   },
   success: {
     title: "Thank you!",
-    message:
-      "Your form was submitted successfully. Thank you for participating.",
+    message: "Your form was submitted successfully. Thank you for participating.",
     fillAnother: "Fill another form",
   },
   form: {
@@ -37,8 +36,7 @@ const enCommon = {
     transportCostsTitle: "Transport costs, {{period}}",
     incomeTitle: "Income, {{period}}",
     movementsDate: "Movement date",
-    movementsDateDescription:
-      "You will need to describe your movements for this day",
+    movementsDateDescription: "You will need to describe your movements for this day",
     departure: "Departure",
     time: "Time",
     point: "Point",
@@ -84,8 +82,7 @@ const enCommon = {
       PERSON_WITH_DISABILITIES: "person with disabilities",
       UNEMPLOYED: "unemployed",
       HOUSEWIFE: "homemaker",
-      TEMPORARILY_UNEMPLOYED:
-        "temporarily not working (maternity leave, childcare leave)",
+      TEMPORARILY_UNEMPLOYED: "temporarily not working (maternity leave, childcare leave)",
     },
     place: {
       HOME_RESIDENCE: "home - place of residence",
@@ -94,12 +91,10 @@ const enCommon = {
       WORK_BUSINESS_TRIP: "work - business trip",
       DAYCARE_CENTER: "daycare center",
       SCHOOL: "school",
-      COLLEGE_TECHNICAL_SCHOOL:
-        "college / technical school / vocational school",
+      COLLEGE_TECHNICAL_SCHOOL: "college / technical school / vocational school",
       UNIVERSITY_INSTITUTE: "university / institute",
       HOSPITAL_CLINIC: "hospital / clinic",
-      CULTURAL_INSTITUTION:
-        "cultural institution (museum, theater, circus, library, etc.)",
+      CULTURAL_INSTITUTION: "cultural institution (museum, theater, circus, library, etc.)",
       SPORT_FITNESS: "sport / fitness",
       STORE_MARKET: "store / market",
       SHOPPING_ENTERTAINMENT_CENTER: "shopping and entertainment center",
@@ -127,8 +122,7 @@ const enCommon = {
     required: "Required field",
     addressMustContainHouse: "Address must include a house number",
     selectAtLeastOneTransport: "Select at least one transport type",
-    departureArrivalMustDiffer:
-      "Departure and arrival points cannot be the same for one movement",
+    departureArrivalMustDiffer: "Departure and arrival points cannot be the same for one movement",
     departureArrivalAddressMustDiffer:
       "Departure and arrival addresses cannot be the same for one movement",
     addAtLeastOneMovement: "Add at least two movements",
@@ -138,8 +132,7 @@ const enCommon = {
     submitUnexpected: "An error occurred while submitting the form.",
     networkConnect: "Could not connect to server.",
     networkSend: "Network error while submitting the form.",
-    networkConnectWithHint:
-      "Could not connect to server. Please make sure the server is running.",
+    networkConnectWithHint: "Could not connect to server. Please make sure the server is running.",
     networkGeneric: "Network error while connecting to server.",
     serverErrorWithStatus: "Server error: {{status}} {{statusText}}",
     badRequest: "Invalid form data. Please check the fields.",
