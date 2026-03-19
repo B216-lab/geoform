@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useDraftStore } from "../store.ts";
 import type { DayMovementsFormValues, MovementValues } from "../schema.ts";
+import { useDraftStore } from "../store.ts";
 
 // Provide a proper localStorage mock for testing
 const localStorageMock = (() => {
@@ -72,10 +72,7 @@ describe("useDraftStore", () => {
     expect(useDraftStore.getState().draft).toEqual(draft);
     expect(useDraftStore.getState().lastSavedAt).toBeTruthy();
     expect(useDraftStore.getState().isRestored).toBe(true);
-    expect(localStorageMock.setItem).toHaveBeenCalledWith(
-      "form",
-      JSON.stringify(draft),
-    );
+    expect(localStorageMock.setItem).toHaveBeenCalledWith("form", JSON.stringify(draft));
   });
 
   it("clearMovements removes movements from draft and storage", () => {
@@ -116,8 +113,6 @@ describe("useDraftStore", () => {
 
     useDraftStore.getState().saveDraft(legacyDraft);
 
-    expect(useDraftStore.getState().draft.movements?.[0]?.movementType).toBe(
-      "ON_FOOT",
-    );
+    expect(useDraftStore.getState().draft.movements?.[0]?.movementType).toBe("ON_FOOT");
   });
 });

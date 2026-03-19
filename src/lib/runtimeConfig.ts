@@ -18,9 +18,8 @@ declare global {
  * environment variables without rebuilding the image.
  */
 export function getApiBaseUrl(): string {
-  const appConfig =
-    (globalThis as typeof globalThis & { __APP_CONFIG__?: AppConfig })
-      .__APP_CONFIG__;
+  const appConfig = (globalThis as typeof globalThis & { __APP_CONFIG__?: AppConfig })
+    .__APP_CONFIG__;
   const runtimeApiUrl = appConfig?.API_BASE_URL;
   if (runtimeApiUrl && runtimeApiUrl.trim() !== "") {
     return runtimeApiUrl.trim().replace(/\/+$/, "");

@@ -1,4 +1,3 @@
-import { Controller, useFormContext, useWatch } from "react-hook-form";
 import {
   alpha,
   Button,
@@ -13,6 +12,7 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { IconBus, IconWalk } from "@tabler/icons-react";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { enumToOptions, Transport, TypeMovement } from "./enums.ts";
 import type { DayMovementsFormValues } from "./schema.ts";
@@ -26,8 +26,7 @@ interface MovementItemProps {
   disabled?: boolean;
 }
 
-const toError = (message: unknown) =>
-  typeof message === "string" ? message : undefined;
+const toError = (message: unknown) => (typeof message === "string" ? message : undefined);
 
 export function MovementItem({
   index,
@@ -44,9 +43,7 @@ export function MovementItem({
   });
   const isDark = colorScheme === "dark";
 
-  const selectedBorderColor = isDark
-    ? theme.colors.blue[4]
-    : theme.colors.blue[6];
+  const selectedBorderColor = isDark ? theme.colors.blue[4] : theme.colors.blue[6];
   const selectedBackground = isDark
     ? alpha(theme.colors.blue[7], 0.35)
     : alpha(theme.colors.blue[1], 0.9);
@@ -60,12 +57,10 @@ export function MovementItem({
   const movementErrors = errors.movements?.[index];
 
   const movementType = useWatch({ control, name: `${prefix}.movementType` });
-  const transports: string[] =
-    useWatch({ control, name: `${prefix}.transport` }) ?? [];
+  const transports: string[] = useWatch({ control, name: `${prefix}.transport` }) ?? [];
 
   const isTransport = movementType === "TRANSPORT";
-  const showPeopleInCar = transports.includes("CAR_SHARING") ||
-    transports.includes("PRIVATE_CAR");
+  const showPeopleInCar = transports.includes("CAR_SHARING") || transports.includes("PRIVATE_CAR");
   const transportOptions = enumToOptions(Transport, t, "enums.transport");
 
   return (
@@ -115,19 +110,14 @@ export function MovementItem({
                         style={{
                           cursor: disabled ? "not-allowed" : "pointer",
                           opacity: disabled ? 0.7 : 1,
-                          borderColor: selectedValue === "ON_FOOT"
-                            ? selectedBorderColor
-                            : undefined,
-                          background: selectedValue === "ON_FOOT"
-                            ? selectedBackground
-                            : undefined,
+                          borderColor:
+                            selectedValue === "ON_FOOT" ? selectedBorderColor : undefined,
+                          background: selectedValue === "ON_FOOT" ? selectedBackground : undefined,
                         }}
                       >
                         <Stack align="center" gap={6}>
                           <IconWalk size={18} />
-                          <Text size="sm">
-                            {t(`enums.typeMovement.${TypeMovement.ON_FOOT}`)}
-                          </Text>
+                          <Text size="sm">{t(`enums.typeMovement.${TypeMovement.ON_FOOT}`)}</Text>
                         </Stack>
                       </Radio.Card>
                       <Radio.Card
@@ -138,19 +128,15 @@ export function MovementItem({
                         style={{
                           cursor: disabled ? "not-allowed" : "pointer",
                           opacity: disabled ? 0.7 : 1,
-                          borderColor: selectedValue === "TRANSPORT"
-                            ? selectedBorderColor
-                            : undefined,
-                          background: selectedValue === "TRANSPORT"
-                            ? selectedBackground
-                            : undefined,
+                          borderColor:
+                            selectedValue === "TRANSPORT" ? selectedBorderColor : undefined,
+                          background:
+                            selectedValue === "TRANSPORT" ? selectedBackground : undefined,
                         }}
                       >
                         <Stack align="center" gap={6}>
                           <IconBus size={18} />
-                          <Text size="sm">
-                            {t(`enums.typeMovement.${TypeMovement.TRANSPORT}`)}
-                          </Text>
+                          <Text size="sm">{t(`enums.typeMovement.${TypeMovement.TRANSPORT}`)}</Text>
                         </Stack>
                       </Radio.Card>
                     </Group>
@@ -261,9 +247,7 @@ export function MovementItem({
                   value={field.value ?? 0}
                   onChange={field.onChange}
                   disabled={disabled}
-                  error={toError(
-                    movementErrors?.waitBetweenTransfersMinutes?.message,
-                  )}
+                  error={toError(movementErrors?.waitBetweenTransfersMinutes?.message)}
                 />
               )}
             />
@@ -281,9 +265,7 @@ interface GroupHeaderProps {
   onRemove: () => void;
 }
 
-function GroupHeader(
-  { title, removeLabel, canRemove, onRemove }: GroupHeaderProps,
-) {
+function GroupHeader({ title, removeLabel, canRemove, onRemove }: GroupHeaderProps) {
   return (
     <div
       style={{
@@ -294,12 +276,7 @@ function GroupHeader(
     >
       <Text fw={600}>{title}</Text>
       {canRemove && (
-        <Button
-          variant="subtle"
-          color="red"
-          size="compact-sm"
-          onClick={onRemove}
-        >
+        <Button variant="subtle" color="red" size="compact-sm" onClick={onRemove}>
           {removeLabel}
         </Button>
       )}

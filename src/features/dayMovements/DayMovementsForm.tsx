@@ -1,12 +1,3 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Controller,
-  type FieldErrors,
-  FormProvider,
-  useFieldArray,
-  useForm,
-  useWatch,
-} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Alert,
@@ -24,11 +15,24 @@ import {
 } from "@mantine/core";
 import { TimePicker } from "@mantine/dates";
 import { IconClockHour3, IconMapPin } from "@tabler/icons-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Controller,
+  type FieldErrors,
+  FormProvider,
+  useFieldArray,
+  useForm,
+  useWatch,
+} from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { AddressAutocomplete } from "../../components/ui/AddressAutocomplete.tsx";
-import { ArrivalPointItem } from "./ArrivalPointItem.tsx";
-import { MovementItem } from "./MovementItem.tsx";
 import { SuccessScreen } from "../../components/SuccessScreen.tsx";
+import { AddressAutocomplete } from "../../components/ui/AddressAutocomplete.tsx";
+import { ApiHttpError, ApiNetworkError } from "../../lib/api.ts";
+import { ArrivalPointItem } from "./ArrivalPointItem.tsx";
+import type { DaDataAddressSuggestion } from "./addressUtils.ts";
+import { enumToOptions, Gender, Place, SocialStatus } from "./enums.ts";
+import { submitDayMovementsForm } from "./formSubmission.ts";
+import { MovementItem } from "./MovementItem.tsx";
 import {
   buildNextMovementFromPrevious,
   chainMovements,
@@ -36,16 +40,12 @@ import {
   dayMovementsSchema,
   defaultFormValues,
   getTimelineStartPoint,
+  type MovementValues,
   mapTimelineFormToPayload,
   movementSchema,
-  type MovementValues,
 } from "./schema.ts";
-import { enumToOptions, Gender, Place, SocialStatus } from "./enums.ts";
-import { useDaDataAddress } from "./useDaDataAddress.ts";
-import { submitDayMovementsForm } from "./formSubmission.ts";
 import { useDraftStore } from "./store.ts";
-import { ApiHttpError, ApiNetworkError } from "../../lib/api.ts";
-import type { DaDataAddressSuggestion } from "./addressUtils.ts";
+import { useDaDataAddress } from "./useDaDataAddress.ts";
 
 const PAGE0_FIELDS = [
   "birthday",
@@ -58,8 +58,7 @@ const PAGE0_FIELDS = [
   "incomeMax",
 ] as const;
 
-const toError = (message: unknown) =>
-  typeof message === "string" ? message : undefined;
+const toError = (message: unknown) => (typeof message === "string" ? message : undefined);
 
 const getMovementsArrayError = (
   movementErrors: FieldErrors<DayMovementsFormValues>["movements"],
@@ -74,13 +73,10 @@ const getMovementsArrayError = (
   return typeof maybeRootMessage === "string" ? maybeRootMessage : undefined;
 };
 
-const hasHouseNumber = (
-  address: DaDataAddressSuggestion | null | undefined,
-): boolean => !!address?.data?.house;
+const hasHouseNumber = (address: DaDataAddressSuggestion | null | undefined): boolean =>
+  !!address?.data?.house;
 
-const isMovementLegReady = (
-  movement: MovementValues | undefined,
-): boolean => {
+const isMovementLegReady = (movement: MovementValues | undefined): boolean => {
   if (!movement) return false;
   if (!movement.movementType) return false;
   if (!movement.departureTime || !movement.departurePlace) return false;
@@ -99,9 +95,7 @@ const isMovementLegReady = (
   return true;
 };
 
-const isStartPointReady = (
-  movement: MovementValues | undefined,
-): boolean => {
+const isStartPointReady = (movement: MovementValues | undefined): boolean => {
   if (!movement) return false;
   if (!movement.departureTime || !movement.departurePlace) return false;
   if (
@@ -117,11 +111,7 @@ export function DayMovementsForm() {
   const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const genderOptions = enumToOptions(Gender, t, "enums.gender");
-  const socialStatusOptions = enumToOptions(
-    SocialStatus,
-    t,
-    "enums.socialStatus",
-  );
+  const socialStatusOptions = enumToOptions(SocialStatus, t, "enums.socialStatus");
   const placeOptions = enumToOptions(Place, t, "enums.place");
 
   const getPlaceLabel = (placeCode: string | undefined): string => {
@@ -133,12 +123,9 @@ export function DayMovementsForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { draft, saveDraft, clearMovements, isRestored } =
-    useDraftStore();
+  const { draft, saveDraft, clearMovements, isRestored } = useDraftStore();
 
-  const initialValues = isRestored
-    ? { ...defaultFormValues, ...draft }
-    : defaultFormValues;
+  const initialValues = isRestored ? { ...defaultFormValues, ...draft } : defaultFormValues;
 
   const methods = useForm<DayMovementsFormValues>({
     resolver: zodResolver(dayMovementsSchema()),
@@ -162,8 +149,7 @@ export function DayMovementsForm() {
     name: "movements",
   });
 
-  const { getAddressItems, ADDRESS_DELAY, DEFAULT_MIN_CHARS } =
-    useDaDataAddress(3);
+  const { getAddressItems, ADDRESS_DELAY, DEFAULT_MIN_CHARS } = useDaDataAddress(3);
 
   const watchedValues = useWatch({ control });
   useEffect(() => {
@@ -174,14 +160,6 @@ export function DayMovementsForm() {
   }, [watchedValues, saveDraft]);
 
   const movements = useWatch({ control, name: "movements" });
-  const movementChainSignature = JSON.stringify(
-    (movements ?? []).map((m) => ({
-      arrivalPlace: m?.arrivalPlace ?? "",
-      arrivalAddressValue: m?.arrivalAddress?.value ?? "",
-      departurePlace: m?.departurePlace ?? "",
-      departureAddressValue: m?.departureAddress?.value ?? "",
-    })),
-  );
 
   useEffect(() => {
     if (!movements || movements.length === 0) return;
@@ -206,10 +184,7 @@ export function DayMovementsForm() {
         }
       }
 
-      if (
-        (currDepartureAddress?.value ?? "") !==
-          (nextDepartureAddress?.value ?? "")
-      ) {
+      if ((currDepartureAddress?.value ?? "") !== (nextDepartureAddress?.value ?? "")) {
         setValue(`movements.${i}.departureAddress`, nextDepartureAddress, {
           shouldDirty: false,
           shouldTouch: false,
@@ -220,12 +195,10 @@ export function DayMovementsForm() {
         }
       }
     }
-  }, [movementChainSignature, movements, setValue, getValues, clearErrors]);
+  }, [movements, setValue, getValues, clearErrors]);
 
   const goToNextStep = useCallback(async () => {
-    const valid = await trigger(
-      PAGE0_FIELDS as unknown as (keyof DayMovementsFormValues)[],
-    );
+    const valid = await trigger(PAGE0_FIELDS as unknown as (keyof DayMovementsFormValues)[]);
     if (valid) setStep(1);
   }, [trigger]);
 
@@ -266,17 +239,12 @@ export function DayMovementsForm() {
     methods.reset(defaultFormValues as DayMovementsFormValues);
   }, [methods]);
 
-  const onInvalidSubmit = useCallback(
-    (formErrors: FieldErrors<DayMovementsFormValues>) => {
-      setSubmitError(null);
-      const hasPage0Errors = PAGE0_FIELDS.some((fieldName) =>
-        Boolean(formErrors[fieldName])
-      );
+  const onInvalidSubmit = useCallback((formErrors: FieldErrors<DayMovementsFormValues>) => {
+    setSubmitError(null);
+    const hasPage0Errors = PAGE0_FIELDS.some((fieldName) => Boolean(formErrors[fieldName]));
 
-      setStep(hasPage0Errors ? 0 : 1);
-    },
-    [],
-  );
+    setStep(hasPage0Errors ? 0 : 1);
+  }, []);
 
   const movementsDate = getValues("movementsDate");
   const isMovementsDateSet = Boolean(movementsDate);
@@ -296,23 +264,21 @@ export function DayMovementsForm() {
   const timelineStartPoint = getTimelineStartPoint(
     (movements as MovementValues[] | undefined) ?? [],
   );
-  const chainedMovements = chainMovements(
-    (movements as MovementValues[] | undefined) ?? [],
-  );
+  const chainedMovements = chainMovements((movements as MovementValues[] | undefined) ?? []);
   const isFirstDepartureReady = isStartPointReady(chainedMovements[0]);
-  const allMovementsComplete = chainedMovements.every((movement) =>
-    movementSchema().safeParse(movement).success
+  const allMovementsComplete = chainedMovements.every(
+    (movement) => movementSchema().safeParse(movement).success,
   );
-  const canAddMovement = isMovementsDateSet && fields.length < 15 &&
-    allMovementsComplete;
+  const canAddMovement = isMovementsDateSet && fields.length < 15 && allMovementsComplete;
   const movementsDateMax = new Date().toISOString().slice(0, 10);
   const previousStartPlaceRef = useRef<string | undefined>(startDeparturePlace);
+  const startDepartureAddressValue = startDepartureAddress?.value;
 
   useEffect(() => {
     if (
       startDeparturePlace === "HOME_RESIDENCE" &&
       homeAddress &&
-      (startDepartureAddress?.value ?? "") !== homeAddress.value
+      (startDepartureAddressValue ?? "") !== homeAddress.value
     ) {
       setValue("movements.0.departureAddress", homeAddress, {
         shouldDirty: false,
@@ -324,7 +290,7 @@ export function DayMovementsForm() {
     if (
       previousStartPlaceRef.current === "HOME_RESIDENCE" &&
       startDeparturePlace !== "HOME_RESIDENCE" &&
-      startDepartureAddress
+      startDepartureAddressValue
     ) {
       setValue("movements.0.departureAddress", null, {
         shouldDirty: true,
@@ -334,12 +300,7 @@ export function DayMovementsForm() {
     }
 
     previousStartPlaceRef.current = startDeparturePlace;
-  }, [
-    startDeparturePlace,
-    homeAddress,
-    startDepartureAddress?.value,
-    setValue,
-  ]);
+  }, [startDeparturePlace, homeAddress, startDepartureAddressValue, setValue]);
 
   if (isSubmitted) {
     return <SuccessScreen onFillAnother={handleFillAnother} />;
@@ -349,12 +310,7 @@ export function DayMovementsForm() {
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit, onInvalidSubmit)} noValidate>
         <Card withBorder radius="md" p="lg" shadow="xs">
-          <Stepper
-            active={step}
-            onStepClick={setStep}
-            allowNextStepsSelect={false}
-            iconSize={28}
-          >
+          <Stepper active={step} onStepClick={setStep} allowNextStepsSelect={false} iconSize={28}>
             <Stepper.Step label={t("form.stepGeneral")} />
             <Stepper.Step label={t("form.stepMovements")} />
           </Stepper>
@@ -424,9 +380,7 @@ export function DayMovementsForm() {
                     <AddressAutocomplete
                       value={field.value as DaDataAddressSuggestion | null}
                       onChange={(val) => {
-                        field.onChange(
-                          val as DayMovementsFormValues["homeAddress"],
-                        );
+                        field.onChange(val as DayMovementsFormValues["homeAddress"]);
                         void trigger("homeAddress");
                       }}
                       getAddressItems={getAddressItems}
@@ -547,14 +501,8 @@ export function DayMovementsForm() {
 
                 {isMovementsDateSet && (
                   <>
-                    <Timeline
-                      bulletSize={24}
-                      lineWidth={2}
-                      active={Math.max(fields.length, 0)}
-                    >
-                      <Timeline.Item
-                        bullet={<IconMapPin size={12} />}
-                      >
+                    <Timeline bulletSize={24} lineWidth={2} active={Math.max(fields.length, 0)}>
+                      <Timeline.Item bullet={<IconMapPin size={12} />}>
                         <Card withBorder radius="md" p="md">
                           <Stack gap="sm">
                             <Text fw={600}>{t("form.departure")}</Text>
@@ -572,10 +520,7 @@ export function DayMovementsForm() {
                                       format="24h"
                                       withSeconds={false}
                                       leftSection={<IconClockHour3 size={16} />}
-                                      error={toError(
-                                        errors.movements?.[0]?.departureTime
-                                          ?.message,
-                                      )}
+                                      error={toError(errors.movements?.[0]?.departureTime?.message)}
                                     />
                                   )}
                                 />
@@ -593,8 +538,7 @@ export function DayMovementsForm() {
                                       value={field.value ?? null}
                                       onChange={field.onChange}
                                       error={toError(
-                                        errors.movements?.[0]?.departurePlace
-                                          ?.message,
+                                        errors.movements?.[0]?.departurePlace?.message,
                                       )}
                                     />
                                   )}
@@ -606,25 +550,20 @@ export function DayMovementsForm() {
                               name="movements.0.departureAddress"
                               render={({ field }) => (
                                 <AddressAutocomplete
-                                  value={field.value as
-                                    | DaDataAddressSuggestion
-                                    | null}
+                                  value={field.value as DaDataAddressSuggestion | null}
                                   onChange={field.onChange}
                                   getAddressItems={getAddressItems}
                                   delay={ADDRESS_DELAY}
                                   minChars={DEFAULT_MIN_CHARS}
-                                  disabled={startDeparturePlace ===
-                                    "HOME_RESIDENCE"}
+                                  disabled={startDeparturePlace === "HOME_RESIDENCE"}
                                   label={t("form.address")}
                                   withAsterisk
-                                  description={startDeparturePlace ===
-                                      "HOME_RESIDENCE"
-                                    ? t("form.homeAddressAutofill")
-                                    : t("form.homeAddressDescription")}
-                                  error={toError(
-                                    errors.movements?.[0]?.departureAddress
-                                      ?.message,
-                                  )}
+                                  description={
+                                    startDeparturePlace === "HOME_RESIDENCE"
+                                      ? t("form.homeAddressAutofill")
+                                      : t("form.homeAddressDescription")
+                                  }
+                                  error={toError(errors.movements?.[0]?.departureAddress?.message)}
                                 />
                               )}
                             />
@@ -634,16 +573,14 @@ export function DayMovementsForm() {
 
                       {isFirstDepartureReady &&
                         fields.flatMap((field, index) => {
-                          const previousPlaceLabel = index === 0
-                            ? getPlaceLabel(timelineStartPoint.departurePlace)
-                            : getPlaceLabel(
-                              movements?.[index - 1]?.arrivalPlace,
-                            );
-                          const previousAddressLabel = index === 0
-                            ? (timelineStartPoint.departureAddress?.value ??
-                              null)
-                            : (movements?.[index - 1]?.arrivalAddress?.value ??
-                              null);
+                          const previousPlaceLabel =
+                            index === 0
+                              ? getPlaceLabel(timelineStartPoint.departurePlace)
+                              : getPlaceLabel(movements?.[index - 1]?.arrivalPlace);
+                          const previousAddressLabel =
+                            index === 0
+                              ? (timelineStartPoint.departureAddress?.value ?? null)
+                              : (movements?.[index - 1]?.arrivalAddress?.value ?? null);
 
                           const items = [
                             <Timeline.Item key={field.id}>
@@ -679,10 +616,7 @@ export function DayMovementsForm() {
                     </Timeline>
 
                     {isFirstDepartureReady && canAddMovement && (
-                      <Button
-                        variant="light"
-                        onClick={addMovementIfPreviousValid}
-                      >
+                      <Button variant="light" onClick={addMovementIfPreviousValid}>
                         {t("form.addMovement")}
                       </Button>
                     )}
@@ -694,11 +628,7 @@ export function DayMovementsForm() {
                 {submitError && <Alert color="red">{submitError}</Alert>}
 
                 <Group justify="space-between">
-                  <Button
-                    type="button"
-                    variant="default"
-                    onClick={goToPreviousStep}
-                  >
+                  <Button type="button" variant="default" onClick={goToPreviousStep}>
                     {t("common.back")}
                   </Button>
                   <Button type="submit" loading={isSubmitting}>

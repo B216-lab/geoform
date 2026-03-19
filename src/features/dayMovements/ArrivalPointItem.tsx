@@ -1,20 +1,12 @@
-import { useEffect, useRef } from "react";
-import { Controller, useFormContext, useWatch } from "react-hook-form";
-import {
-  Card,
-  Grid,
-  NumberInput,
-  Select,
-  Stack,
-  Text,
-  Textarea,
-} from "@mantine/core";
+import { Card, Grid, NumberInput, Select, Stack, Text, Textarea } from "@mantine/core";
 import { TimePicker } from "@mantine/dates";
 import { IconClockHour3 } from "@tabler/icons-react";
+import { useEffect, useRef } from "react";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { AddressAutocomplete } from "../../components/ui/AddressAutocomplete.tsx";
-import { enumToOptions, Place } from "./enums.ts";
 import type { DaDataAddressSuggestion } from "./addressUtils.ts";
+import { enumToOptions, Place } from "./enums.ts";
 import type { DayMovementsFormValues } from "./schema.ts";
 
 interface ArrivalPointItemProps {
@@ -26,8 +18,7 @@ interface ArrivalPointItemProps {
   addressMinChars: number;
 }
 
-const toError = (message: unknown) =>
-  typeof message === "string" ? message : undefined;
+const toError = (message: unknown) => (typeof message === "string" ? message : undefined);
 
 export function ArrivalPointItem({
   index,
@@ -59,12 +50,13 @@ export function ArrivalPointItem({
 
   const isTransport = movementType === "TRANSPORT";
   const placeOptions = enumToOptions(Place, t, "enums.place");
+  const arrivalAddressValue = arrivalAddress?.value;
 
   useEffect(() => {
     if (
       arrivalPlace === "HOME_RESIDENCE" &&
       homeAddress &&
-      (arrivalAddress?.value ?? "") !== homeAddress.value
+      (arrivalAddressValue ?? "") !== homeAddress.value
     ) {
       setValue(`${prefix}.arrivalAddress`, homeAddress, {
         shouldDirty: false,
@@ -77,7 +69,7 @@ export function ArrivalPointItem({
     if (
       previousArrivalPlaceRef.current === "HOME_RESIDENCE" &&
       arrivalPlace !== "HOME_RESIDENCE" &&
-      arrivalAddress
+      arrivalAddressValue
     ) {
       setValue(`${prefix}.arrivalAddress`, null, {
         shouldDirty: true,
@@ -87,14 +79,7 @@ export function ArrivalPointItem({
     }
 
     previousArrivalPlaceRef.current = arrivalPlace;
-  }, [
-    arrivalPlace,
-    homeAddress,
-    arrivalAddress?.value,
-    prefix,
-    setValue,
-    clearErrors,
-  ]);
+  }, [arrivalPlace, homeAddress, arrivalAddressValue, prefix, setValue, clearErrors]);
 
   return (
     <Card withBorder radius="md" p="lg" shadow="xs">
@@ -153,12 +138,16 @@ export function ArrivalPointItem({
               disabled={disabled || arrivalPlace === "HOME_RESIDENCE"}
               label={t("form.address")}
               withAsterisk
-              description={arrivalPlace === "HOME_RESIDENCE"
-                ? t("form.homeAddressAutofill")
-                : t("form.homeAddressDescription")}
-              error={arrivalPlace === "HOME_RESIDENCE"
-                ? undefined
-                : toError(movementErrors?.arrivalAddress?.message)}
+              description={
+                arrivalPlace === "HOME_RESIDENCE"
+                  ? t("form.homeAddressAutofill")
+                  : t("form.homeAddressDescription")
+              }
+              error={
+                arrivalPlace === "HOME_RESIDENCE"
+                  ? undefined
+                  : toError(movementErrors?.arrivalAddress?.message)
+              }
             />
           )}
         />
@@ -176,9 +165,7 @@ export function ArrivalPointItem({
                   value={field.value ?? undefined}
                   onChange={field.onChange}
                   disabled={disabled}
-                  error={toError(
-                    movementErrors?.walkFromFinishMinutes?.message,
-                  )}
+                  error={toError(movementErrors?.walkFromFinishMinutes?.message)}
                 />
               )}
             />

@@ -1,6 +1,6 @@
-import { getApiBaseUrl } from "../../lib/runtimeConfig.ts";
 import { ApiHttpError, ApiNetworkError } from "../../lib/api.ts";
 import i18n from "../../lib/i18n.ts";
+import { getApiBaseUrl } from "../../lib/runtimeConfig.ts";
 import type { DayMovementsFormValues } from "./schema.ts";
 
 /**
@@ -11,9 +11,7 @@ import type { DayMovementsFormValues } from "./schema.ts";
  * @throws ApiNetworkError on network failure
  * @throws ApiHttpError on non-2xx responses
  */
-export async function submitDayMovementsForm(
-  data: DayMovementsFormValues,
-): Promise<Response> {
+export async function submitDayMovementsForm(data: DayMovementsFormValues): Promise<Response> {
   const endpoint = `${getApiBaseUrl()}/v1/public/forms/movements`;
 
   let response: Response;
@@ -24,9 +22,8 @@ export async function submitDayMovementsForm(
       body: JSON.stringify(data),
     });
   } catch (error) {
-    const message = error instanceof TypeError
-      ? i18n.t("errors.networkConnect")
-      : i18n.t("errors.networkSend");
+    const message =
+      error instanceof TypeError ? i18n.t("errors.networkConnect") : i18n.t("errors.networkSend");
     throw new ApiNetworkError(message, error);
   }
 

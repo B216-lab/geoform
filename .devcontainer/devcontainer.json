@@ -10,20 +10,14 @@
     },
     "ghcr.io/dhoeric/features/hadolint:1": {}
   },
-  "forwardPorts": [
-    5173
-  ],
+  "forwardPorts": [5173],
   "portsAttributes": {
     "5173": {
       "label": "Vite app"
     }
   },
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-  "runArgs": [
-    "--init",
-    "--network",
-    "shared-net"
-  ],
+  "runArgs": ["--init", "--network", "shared-net"],
   "containerEnv": {
     "NODE_ENV": "development",
     "CHOKIDAR_USEPOLLING": "true",
@@ -39,10 +33,7 @@
   "remoteUser": "vscode",
   "customizations": {
     "vscode": {
-      "extensions": [
-        "denoland.vscode-deno",
-        "exiasr.hadolint"
-      ],
+      "extensions": ["denoland.vscode-deno", "exiasr.hadolint"],
       "settings": {
         "editor.formatOnSave": true
       }

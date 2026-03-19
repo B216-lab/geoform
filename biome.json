@@ -7,7 +7,14 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!**/node_modules", "!**/dist", "!**/*.lock", "!**/*.yaml"]
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/*.lock",
+      "!**/*.yaml",
+      "!**/env.template.js"
+    ]
   },
   "formatter": {
     "enabled": true,
