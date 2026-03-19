@@ -99,4 +99,25 @@ describe("useDraftStore", () => {
     useDraftStore.getState().saveDraft(makeDraft());
     expect(useDraftStore.getState().isRestored).toBe(true);
   });
+
+  it("saveDraft normalizes legacy movement data in memory", () => {
+    const legacyDraft = {
+      ...makeDraft(),
+      movements: [
+        {
+          departureTime: "08:00",
+          departurePlace: "HOME_RESIDENCE",
+          arrivalTime: "08:30",
+          arrivalPlace: "WORKPLACE",
+          waitBetweenTransfersMinutes: 0,
+        },
+      ],
+    } as unknown as DayMovementsFormValues;
+
+    useDraftStore.getState().saveDraft(legacyDraft);
+
+    expect(useDraftStore.getState().draft.movements?.[0]?.movementType).toBe(
+      "ON_FOOT",
+    );
+  });
 });

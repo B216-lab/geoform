@@ -59,10 +59,11 @@ export const useDraftStore = create<DraftState>()(
       isRestored: Object.keys(readFromStorage()).length > 0,
 
       saveDraft: (values) => {
-        writeToStorage(values);
+        const normalized = normalizeDraft(values);
+        writeToStorage(normalized);
         set(
           {
-            draft: values,
+            draft: normalized,
             lastSavedAt: new Date().toISOString(),
             isRestored: true,
           },
