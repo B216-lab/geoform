@@ -9,11 +9,15 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check --write .",
     "prepare": "husky",
     "lint-staged": "lint-staged",
     "commitlint": "commitlint"
   },
-  "packageManager": "pnpm@10.25.0",
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
     "@mantine/core": "^8.3.15",
@@ -50,11 +54,9 @@
     "vitest": "^3.2.1"
   },
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx,mjs,cjs}": [
-      "deno fmt",
-      "deno lint --fix"
+    "**/*.{js,jsx,ts,tsx,mjs,cjs,json}": [
+      "biome check --write --no-errors-on-unmatched"
     ],
-    "**/*": "deno fmt",
     "Dockerfile": "hadolint"
   }
 }
