@@ -71,6 +71,7 @@ describe("useDraftStore", () => {
 
     expect(useDraftStore.getState().draft).toEqual(draft);
     expect(useDraftStore.getState().lastSavedAt).toBeTruthy();
+    expect(useDraftStore.getState().isRestored).toBe(true);
     expect(localStorageMock.setItem).toHaveBeenCalledWith(
       "form",
       JSON.stringify(draft),
@@ -93,9 +94,9 @@ describe("useDraftStore", () => {
     expect(stored.movements).toHaveLength(1);
   });
 
-  it("markRestored sets isRestored to true", () => {
+  it("saveDraft marks state as restored for remounts", () => {
     expect(useDraftStore.getState().isRestored).toBe(false);
-    useDraftStore.getState().markRestored();
+    useDraftStore.getState().saveDraft(makeDraft());
     expect(useDraftStore.getState().isRestored).toBe(true);
   });
 });

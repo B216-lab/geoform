@@ -23,8 +23,6 @@ interface DraftState {
   saveDraft: (values: DayMovementsFormValues) => void;
   /** Clear only the movements portion (called on successful submit) */
   clearMovements: () => void;
-  /** Mark the draft as already restored into RHF */
-  markRestored: () => void;
 }
 
 function getStorage(): Storage | null {
@@ -63,7 +61,11 @@ export const useDraftStore = create<DraftState>()(
       saveDraft: (values) => {
         writeToStorage(values);
         set(
-          { draft: values, lastSavedAt: new Date().toISOString() },
+          {
+            draft: values,
+            lastSavedAt: new Date().toISOString(),
+            isRestored: true,
+          },
           undefined,
           "draft/saveDraft",
         );
@@ -75,9 +77,6 @@ export const useDraftStore = create<DraftState>()(
         writeToStorage(updated);
         set({ draft: updated }, undefined, "draft/clearMovements");
       },
-
-      markRestored: () =>
-        set({ isRestored: true }, undefined, "draft/markRestored"),
     }),
     {
       name: "DayMovementsDraftStore",
