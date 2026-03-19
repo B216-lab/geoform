@@ -57,6 +57,6 @@
     "**/*.{js,jsx,ts,tsx,mjs,cjs,json}": [
       "biome check --write --no-errors-on-unmatched"
     ],
-    "Dockerfile": "hadolint"
+    "Dockerfile": "bunx hadolint"
   }
 }
