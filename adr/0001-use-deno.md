@@ -1,24 +1,24 @@
-# Использовать deno
+# Use Deno
 
 - 2026-02-20
 
-# Контекст
+# Context
 
-Переписывание Vue3 + VueForm на нормальный react-hook-form + React.
-"Нормальный", потому что форма сбора инфы о передвижениях на самом деле прям
-сложная, поэтому отделаться даже такой либой, как VueForm не получится, я
-закопался в ней, пытаясь удовлетворить некоторые правки.
+Rewriting Vue3 + VueForm to a proper react-hook-form + React setup.
+"Proper", because the form for collecting movement information is actually quite
+complex, so getting by with even a library like VueForm wasn't possible—I got
+stuck in it trying to accommodate some changes.
 
-# Решение
+# Decision
 
-По-приколу используем только потому что
+Using it mostly for fun because:
 
-1. Не мешает и может быть относительно быстро полностью убрана
-2. Не надо париться с prettier, eslint, потому что тут всё включено и
-   перспективно (я не оч люблю конфигурировать prettier и eslint)
+1. It doesn't get in the way and can be fully removed relatively quickly
+2. No need to fuss with prettier, eslint—everything is built-in and
+   promising (I don't really enjoy configuring prettier and eslint)
 
-# Последствия
+# Consequences
 
-Да по сути никаких. Обидно только, что пакеты всё равно придется брать как
-обычно и поэтому нужен node, и поэтому чувствуется, что ради пары tool'зов тут
-deno. Такое себе...
+Essentially none. The only bummer is that packages still have to be fetched
+the usual way, so node is needed anyway, and it feels like Deno is here just
+for a couple of tools. Oh well...
