@@ -2,6 +2,13 @@
 
 Detailed guidance on splitting large components into smaller, focused components.
 
+## Table of Contents
+
+- [When to Split Components](#when-to-split-components)
+- [Apply Splitting Strategies](#apply-splitting-strategies) (section-based, conditional block, modal, list item extraction)
+- [Choose a Directory Structure](#choose-a-directory-structure) (flat, nested, feature-based)
+- [Design Props](#design-props) (minimal props, callbacks, render props)
+
 ## When to Split Components
 
 Split a component when you identify:
@@ -12,7 +19,7 @@ Split a component when you identify:
 4. **300+ lines** - Component exceeds manageable size
 5. **Modal clusters** - Multiple modals rendered in one component
 
-## Splitting Strategies
+## Apply Splitting Strategies
 
 ### Strategy 1: Section-Based Splitting
 
@@ -330,7 +337,7 @@ const ActionList = () => {
 }
 ```
 
-## Directory Structure Patterns
+## Choose a Directory Structure
 
 ### Pattern A: Flat Structure (Simple Components)
 
@@ -392,7 +399,7 @@ dashboard/
       └── use-dashboard-data.ts
 ```
 
-## Props Design
+## Design Props
 
 ### Minimal Props Principle
 

@@ -2,7 +2,20 @@
 
 Patterns for reducing cognitive complexity in React components.
 
-## Understanding Complexity
+## Table of Contents
+
+- [Understand Complexity](#understand-complexity) (cognitive complexity scoring)
+- [Pattern 1: Replace Conditionals with Lookup Tables](#pattern-1-replace-conditionals-with-lookup-tables)
+- [Pattern 2: Use Early Returns](#pattern-2-use-early-returns)
+- [Pattern 3: Extract Complex Conditions](#pattern-3-extract-complex-conditions)
+- [Pattern 4: Replace Chained Ternaries](#pattern-4-replace-chained-ternaries)
+- [Pattern 5: Flatten Nested Loops](#pattern-5-flatten-nested-loops)
+- [Pattern 6: Extract Event Handler Logic](#pattern-6-extract-event-handler-logic)
+- [Pattern 7: Reduce Boolean Logic Complexity](#pattern-7-reduce-boolean-logic-complexity)
+- [Pattern 8: Simplify useMemo/useCallback Dependencies](#pattern-8-simplify-usememousecallback-dependencies)
+- [Target Metrics After Refactoring](#target-metrics-after-refactoring)
+
+## Understand Complexity
 
 ### Cognitive Complexity
 

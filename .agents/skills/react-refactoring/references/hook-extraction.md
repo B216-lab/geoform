@@ -2,6 +2,14 @@
 
 Detailed guidance on extracting custom hooks from complex React components.
 
+## Table of Contents
+
+- [When to Extract Hooks](#when-to-extract-hooks)
+- [Follow the Extraction Process](#follow-the-extraction-process) (Steps 1-4: identify state groups, related effects, create hook, update component)
+- [Follow Naming Conventions](#follow-naming-conventions) (hooks, files, return types)
+- [Common Hook Patterns](#common-hook-patterns) (data fetching, form state, modal state, toggle/boolean)
+- [Test Extracted Hooks](#test-extracted-hooks)
+
 ## When to Extract Hooks
 
 Extract a custom hook when you identify:
@@ -11,7 +19,7 @@ Extract a custom hook when you identify:
 3. **Business logic** - Data transformations, validations, or calculations
 4. **Reusable patterns** - Logic that appears in multiple components
 
-## Extraction Process
+## Follow the Extraction Process
 
 ### Step 1: Identify State Groups
 
@@ -130,7 +138,7 @@ const Settings: FC = () => {
 }
 ```
 
-## Naming Conventions
+## Follow Naming Conventions
 
 ### Hook Names
 
@@ -256,7 +264,7 @@ export const useToggle = (initialValue = false) => {
 const [isExpanded, { toggle, setTrue: expand, setFalse: collapse }] = useToggle()
 ```
 
-## Testing Extracted Hooks
+## Test Extracted Hooks
 
 After extraction, test hooks in isolation:
 
