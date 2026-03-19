@@ -133,7 +133,7 @@ export function DayMovementsForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { draft, saveDraft, clearMovements, isRestored, markRestored } =
+  const { draft, saveDraft, clearMovements, isRestored } =
     useDraftStore();
 
   const initialValues = isRestored
@@ -164,10 +164,6 @@ export function DayMovementsForm() {
 
   const { getAddressItems, ADDRESS_DELAY, DEFAULT_MIN_CHARS } =
     useDaDataAddress(3);
-
-  useEffect(() => {
-    if (!isRestored) markRestored();
-  }, [isRestored, markRestored]);
 
   const watchedValues = useWatch({ control });
   useEffect(() => {
