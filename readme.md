@@ -10,12 +10,9 @@
 
 ## Development
 
-1. Install [mkcert](https://github.com/FiloSottile/mkcert) on your host
-2. [Install Docker on your host](https://letmegooglethat.com/?q=install+docker)
-3. Create `.env`. Look at the reference at [.env.example](./.env.example)
-4. Use [devcontainer](./.devcontainer/devcontainer.json)
+Use [devcontainer](./.devcontainer/devcontainer.json)
 
 ## Contribution
 
 Look at
-[contributing.md](https://github.com/B216-lab/.github/blob/main/.github/contributing.md)
+[contributing.md](https://github.com/B216-lab/.github/blob/main/.github/.github/CONTRIBUTING.md)
