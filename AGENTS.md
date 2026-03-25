@@ -108,6 +108,9 @@ src/
 - Scope is optional but helpful: `fix(schema): reject empty movements
   array`.
 - Keep commits atomic — one logical change per commit.
+- Pull request titles must follow conventional-commit style too:
+  `type(scope): short summary` (for example `feat(forms): add respondent key
+  access gate`). Do not use non-conventional PR prefixes.
 
 ### Pre-commit hooks (Husky + lint-staged)
 

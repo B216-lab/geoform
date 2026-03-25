@@ -1,5 +1,12 @@
 import "@testing-library/jest-dom/vitest";
 
+Object.defineProperty(globalThis, "__APP_CONFIG__", {
+  writable: true,
+  value: {
+    API_BASE_URL: "http://localhost:8081",
+  },
+});
+
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: (query: string) => ({
