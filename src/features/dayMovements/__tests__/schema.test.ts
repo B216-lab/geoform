@@ -86,6 +86,12 @@ describe("dayMovementsSchema", () => {
     data.movements = [data.movements[0]!];
     const result = dayMovementsSchema().safeParse(data);
     expect(result.success).toBe(false);
+    if (!result.success) {
+      const movementCountIssue = result.error.issues.find(
+        (issue) => issue.path.join(".") === "movements",
+      );
+      expect(movementCountIssue?.message).toBe(i18n.t("validation.addAtLeastTwoMovements"));
+    }
   });
 
   it("requires transport selection when movementType is TRANSPORT", () => {

@@ -176,7 +176,10 @@ export const dayMovementsSchema = () =>
 
     // Page 1 — movements
     movementsDate: requiredStringSchema(),
-    movements: z.array(movementSchema()).min(2, i18n.t("validation.addAtLeastOneMovement")).max(15),
+    movements: z
+      .array(movementSchema())
+      .min(2, i18n.t("validation.addAtLeastTwoMovements"))
+      .max(15),
   });
 
 export type DayMovementsFormValues = z.infer<ReturnType<typeof dayMovementsSchema>>;
