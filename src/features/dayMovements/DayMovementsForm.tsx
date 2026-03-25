@@ -82,7 +82,7 @@ const isStartPointReady = (movement: MovementValues | undefined): boolean => {
   return true;
 };
 
-export function DayMovementsForm() {
+export function DayMovementsForm({ respondentKey }: { respondentKey: string }) {
   const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const genderOptions = enumToOptions(Gender, t, "enums.gender");
@@ -191,7 +191,7 @@ export function DayMovementsForm() {
       setSubmitError(null);
       try {
         const payload = mapTimelineFormToPayload(data);
-        await submitDayMovementsForm(payload);
+        await submitDayMovementsForm(payload, respondentKey);
         setIsSubmitted(true);
         clearMovements();
       } catch (err) {
@@ -204,7 +204,7 @@ export function DayMovementsForm() {
         setIsSubmitting(false);
       }
     },
-    [clearMovements, t],
+    [clearMovements, respondentKey, t],
   );
 
   const handleFillAnother = useCallback(() => {
