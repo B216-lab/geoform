@@ -18,6 +18,7 @@ const enCommon = {
     finish: "Finish",
     addressPlaceholder: "Start typing an address...",
     currencyPerMonth: "RUB/month",
+    retry: "Retry",
   },
   success: {
     title: "Thank you!",
@@ -43,6 +44,7 @@ const enCommon = {
     address: "Address",
     homeAddressAutofill: "Address is filled from home address",
     addMovement: "Add movement",
+    validatingRespondentKey: "Validating access link...",
   },
   movement: {
     title: "Movement {{index}}",
@@ -138,6 +140,13 @@ const enCommon = {
     badRequest: "Invalid form data. Please check the fields.",
     endpointNotFound: "Server is unavailable or endpoint was not found.",
     internalServer: "Internal server error. Please try again later.",
+    respondentKeyMissingTitle: "Access link is required",
+    respondentKeyMissing: "This form is available only via a personal link with respondent key.",
+    respondentKeyInvalidTitle: "Invalid access link",
+    respondentKeyInvalid: "This respondent key is invalid or expired.",
+    respondentKeyValidationFailedTitle: "Could not verify access link",
+    respondentKeyValidationFailed: "Could not validate respondent key. Please try again later.",
+    respondentKeyValidationNetwork: "Network error while validating respondent key.",
   },
 } as const;
 

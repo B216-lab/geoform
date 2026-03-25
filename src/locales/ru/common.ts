@@ -18,6 +18,7 @@ const ruCommon = {
     finish: "Завершить",
     addressPlaceholder: "Начните вводить адрес...",
     currencyPerMonth: "₽/мес",
+    retry: "Повторить",
   },
   success: {
     title: "Спасибо!",
@@ -43,6 +44,7 @@ const ruCommon = {
     address: "Адрес",
     homeAddressAutofill: "Адрес подставлен из адреса проживания",
     addMovement: "Добавить передвижение",
+    validatingRespondentKey: "Проверяем ссылку доступа...",
   },
   movement: {
     title: "Передвижение {{index}}",
@@ -140,6 +142,13 @@ const ruCommon = {
     badRequest: "Неверные данные формы. Проверьте заполненные поля.",
     endpointNotFound: "Сервер недоступен или эндпоинт не найден.",
     internalServer: "Внутренняя ошибка сервера. Попробуйте позже.",
+    respondentKeyMissingTitle: "Нужна персональная ссылка",
+    respondentKeyMissing: "Эта форма доступна только по персональной ссылке с ключом респондента.",
+    respondentKeyInvalidTitle: "Некорректная ссылка доступа",
+    respondentKeyInvalid: "Ключ респондента недействителен или истек.",
+    respondentKeyValidationFailedTitle: "Не удалось проверить ссылку",
+    respondentKeyValidationFailed: "Не удалось проверить ключ респондента. Попробуйте позже.",
+    respondentKeyValidationNetwork: "Ошибка сети при проверке ключа респондента.",
   },
 } as const;
 
