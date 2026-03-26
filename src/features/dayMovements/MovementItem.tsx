@@ -64,7 +64,7 @@ export function MovementItem({
   const transportOptions = enumToOptions(Transport, t, "enums.transport");
 
   return (
-    <Card withBorder radius="md" p="lg" shadow="xs">
+    <Card data-testid={`movement-item-${index}`} withBorder radius="md" p="lg" shadow="xs">
       <Stack gap="md">
         <GroupHeader
           title={t("movement.title", { index: index + 1 })}
@@ -96,6 +96,7 @@ export function MovementItem({
                 const selectedValue = field.value ?? "ON_FOOT";
                 return (
                   <Radio.Group
+                    data-testid={`movement-${index}-type`}
                     name={field.name}
                     value={selectedValue}
                     onChange={field.onChange}
@@ -103,6 +104,7 @@ export function MovementItem({
                   >
                     <Group justify="center" grow>
                       <Radio.Card
+                        data-testid={`movement-${index}-type-on-foot`}
                         value="ON_FOOT"
                         radius="md"
                         withBorder
@@ -121,6 +123,7 @@ export function MovementItem({
                         </Stack>
                       </Radio.Card>
                       <Radio.Card
+                        data-testid={`movement-${index}-type-transport`}
                         value="TRANSPORT"
                         radius="md"
                         withBorder
@@ -158,6 +161,7 @@ export function MovementItem({
             name={`${prefix}.transport`}
             render={({ field }) => (
               <MultiSelect
+                data-testid={`movement-${index}-transport`}
                 label={t("movement.transportType")}
                 data={transportOptions}
                 value={field.value ?? []}
@@ -176,6 +180,7 @@ export function MovementItem({
             name={`${prefix}.numberPeopleInCar`}
             render={({ field }) => (
               <NumberInput
+                data-testid={`movement-${index}-people-in-car`}
                 label={t("movement.peopleInCar")}
                 min={1}
                 max={15}
@@ -196,6 +201,7 @@ export function MovementItem({
               name={`${prefix}.walkToStartMinutes`}
               render={({ field }) => (
                 <NumberInput
+                  data-testid={`movement-${index}-walk-to-start-minutes`}
                   label={t("movement.walkToStart")}
                   min={0}
                   max={180}
@@ -211,6 +217,7 @@ export function MovementItem({
               name={`${prefix}.waitAtStartMinutes`}
               render={({ field }) => (
                 <NumberInput
+                  data-testid={`movement-${index}-wait-at-start-minutes`}
                   label={t("movement.waitAtStart")}
                   min={0}
                   max={180}
@@ -226,6 +233,7 @@ export function MovementItem({
               name={`${prefix}.numberOfTransfers`}
               render={({ field }) => (
                 <NumberInput
+                  data-testid={`movement-${index}-number-of-transfers`}
                   label={t("movement.transfersCount")}
                   min={0}
                   max={15}
@@ -241,6 +249,7 @@ export function MovementItem({
               name={`${prefix}.waitBetweenTransfersMinutes`}
               render={({ field }) => (
                 <NumberInput
+                  data-testid={`movement-${index}-wait-between-transfers-minutes`}
                   label={t("movement.waitBetweenTransfers")}
                   min={0}
                   max={180}

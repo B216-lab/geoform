@@ -98,6 +98,7 @@ export function GeneralInfoStep({
         name="homeAddress"
         render={({ field }) => (
           <AddressAutocomplete
+            testId="home-address-input"
             value={field.value as DaDataAddressSuggestion | null}
             onChange={(val) => {
               field.onChange(val as DayMovementsFormValues["homeAddress"]);
@@ -126,6 +127,7 @@ export function GeneralInfoStep({
               name="transportCostMin"
               render={({ field }) => (
                 <NumberInput
+                  data-testid="transport-cost-min-input"
                   label={t("common.min")}
                   min={0}
                   max={20000}
@@ -143,6 +145,7 @@ export function GeneralInfoStep({
               name="transportCostMax"
               render={({ field }) => (
                 <NumberInput
+                  data-testid="transport-cost-max-input"
                   label={t("common.max")}
                   min={0}
                   max={20000}
@@ -170,6 +173,7 @@ export function GeneralInfoStep({
               name="incomeMin"
               render={({ field }) => (
                 <NumberInput
+                  data-testid="income-min-input"
                   label={t("common.min")}
                   min={0}
                   max={250000}
@@ -187,6 +191,7 @@ export function GeneralInfoStep({
               name="incomeMax"
               render={({ field }) => (
                 <NumberInput
+                  data-testid="income-max-input"
                   label={t("common.max")}
                   min={0}
                   max={250000}
