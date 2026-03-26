@@ -82,7 +82,7 @@ export function ArrivalPointItem({
   }, [arrivalPlace, homeAddress, arrivalAddressValue, prefix, setValue, clearErrors]);
 
   return (
-    <Card withBorder radius="md" p="lg" shadow="xs">
+    <Card data-testid={`arrival-item-${index}`} withBorder radius="md" p="lg" shadow="xs">
       <Stack gap="md">
         <Text fw={600}>{t("arrival.title", { index: index + 1 })}</Text>
 
@@ -93,6 +93,7 @@ export function ArrivalPointItem({
               name={`${prefix}.arrivalTime`}
               render={({ field }) => (
                 <TimePicker
+                  data-testid={`movement-${index}-arrival-time`}
                   label={t("form.time")}
                   withAsterisk
                   value={field.value ?? ""}
@@ -112,6 +113,7 @@ export function ArrivalPointItem({
               name={`${prefix}.arrivalPlace`}
               render={({ field }) => (
                 <Select
+                  data-testid={`movement-${index}-arrival-place`}
                   label={t("form.point")}
                   withAsterisk
                   data={placeOptions}
@@ -130,6 +132,7 @@ export function ArrivalPointItem({
           name={`${prefix}.arrivalAddress`}
           render={({ field }) => (
             <AddressAutocomplete
+              testId={`movement-${index}-arrival-address`}
               value={field.value ?? null}
               onChange={field.onChange}
               getAddressItems={getAddressItems}
@@ -159,6 +162,7 @@ export function ArrivalPointItem({
               name={`${prefix}.walkFromFinishMinutes`}
               render={({ field }) => (
                 <NumberInput
+                  data-testid={`movement-${index}-arrival-walk-from-finish-minutes`}
                   label={t("arrival.walkFromFinish")}
                   min={0}
                   max={180}
@@ -175,6 +179,7 @@ export function ArrivalPointItem({
               name={`${prefix}.tripCost`}
               render={({ field }) => (
                 <NumberInput
+                  data-testid={`movement-${index}-arrival-trip-cost`}
                   label={t("arrival.tripCost")}
                   min={0}
                   max={25000}
@@ -190,6 +195,7 @@ export function ArrivalPointItem({
         )}
 
         <Textarea
+          data-testid={`movement-${index}-arrival-comment`}
           label={t("arrival.comment")}
           error={toError(movementErrors?.comment?.message)}
           description={t("arrival.commentDescription")}

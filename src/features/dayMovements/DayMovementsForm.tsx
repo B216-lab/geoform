@@ -282,7 +282,11 @@ export function DayMovementsForm({ respondentKey }: { respondentKey: string }) {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit, onInvalidSubmit)} noValidate>
+      <form
+        data-testid="day-movements-form"
+        onSubmit={handleSubmit(onSubmit, onInvalidSubmit)}
+        noValidate
+      >
         <Card withBorder radius="md" p="lg" shadow="xs">
           <Stepper active={step} onStepClick={setStep} allowNextStepsSelect={false} iconSize={28}>
             <Stepper.Step label={t("form.stepGeneral")} />
