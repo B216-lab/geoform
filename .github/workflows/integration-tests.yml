@@ -1,0 +1,90 @@
+name: Integration Tests
+
+on:
+  pull_request:
+    branches:
+      - release/*
+  workflow_dispatch:
+    inputs:
+      backend_release_tag:
+        description: "umrs-back release tag with OpenAPI spec"
+        required: true
+        default: "v1.0.0"
+        type: string
+
+env:
+  BUN_VERSION: "1.3.11"
+  BACKEND_RELEASE_TAG: ${{ inputs.backend_release_tag || 'v1.0.0' }}
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Download backend release tarball
+        run: |
+          mkdir -p .ci/backend-src .ci/backend
+          curl -fsSL \
+            -o .ci/backend-src/release.tar.gz \
+            "https://github.com/B216-lab/umrs-back/archive/refs/tags/${BACKEND_RELEASE_TAG}.tar.gz"
+
+      - name: Extract OpenAPI spec
+        run: |
+          tar -xzf .ci/backend-src/release.tar.gz -C .ci/backend-src --strip-components=1
+          SPEC_PATH="$(find .ci/backend-src -type f \( -name 'openapi.yaml' -o -name 'openapi.yml' \) | head -n 1)"
+          if [ -z "$SPEC_PATH" ]; then
+            echo "OpenAPI file not found in umrs-back ${BACKEND_RELEASE_TAG}" >&2
+            exit 1
+          fi
+          cp "$SPEC_PATH" .ci/backend/openapi.yaml
+
+      - name: Start integration stack
+        run: docker compose -f ci-integration-compose.yml up -d --build
+
+      - name: Wait for frontend readiness
+        run: |
+          for i in {1..40}; do
+            if curl --fail --silent http://localhost:4173 > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose -f ci-integration-compose.yml logs
+          exit 1
+
+      - name: Run integration tests
+        env:
+          PLAYWRIGHT_APP_URL: http://127.0.0.1:4173
+        run: npx playwright test --config=playwright.config.ts
+
+      - name: Tear down stack
+        if: always()
+        run: docker compose -f ci-integration-compose.yml down -v
