@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import { Autocomplete, Loader } from "@mantine/core";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { DaDataAddressSuggestion } from "../../features/dayMovements/addressUtils.ts";
 
@@ -7,6 +7,7 @@ interface AddressAutocompleteProps {
   value: DaDataAddressSuggestion | null;
   onChange: (value: DaDataAddressSuggestion | null) => void;
   getAddressItems: (query: string) => Promise<DaDataAddressSuggestion[]>;
+  testId?: string;
   delay?: number;
   minChars?: number;
   disabled?: boolean;
@@ -21,6 +22,7 @@ export function AddressAutocomplete({
   value,
   onChange,
   getAddressItems,
+  testId,
   delay = 1000,
   minChars = 3,
   disabled = false,
@@ -88,6 +90,7 @@ export function AddressAutocomplete({
 
   return (
     <Autocomplete
+      data-testid={testId}
       value={query}
       disabled={disabled}
       label={label}
