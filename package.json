@@ -7,7 +7,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:integration": "playwright test --config=playwright.config.ts",
+    "test:integration": "npx playwright test --config=playwright.config.ts",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "format": "biome format --write .",
