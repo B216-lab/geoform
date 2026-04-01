@@ -127,6 +127,7 @@ const enCommon = {
     departureArrivalMustDiffer: "Departure and arrival points cannot be the same for one movement",
     departureArrivalAddressMustDiffer:
       "Departure and arrival addresses cannot be the same for one movement",
+    arrivalAfterDeparture: "Arrival time must be after departure time",
     addAtLeastTwoMovements:
       "Add at least two movements, for example: home -> work and work -> home. Include short local or suburban trips if they happened that day.",
   },

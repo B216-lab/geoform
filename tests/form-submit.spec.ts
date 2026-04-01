@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 const HOME_ADDRESS_QUERY = "Lenina";
 const ARRIVAL_ADDRESS_QUERY = "Karl";
@@ -6,10 +6,10 @@ const SUBMISSION_MARKER = process.env.INTEGRATION_TEST_MARKER ?? "integration-te
 
 async function fillTime(testId: string, value: string, page: Page) {
   const [hours, minutes] = value.split(":");
-  const spinbuttons = page.getByTestId(testId).locator('input[role="spinbutton"]');
+  const timeInputs = page.getByTestId(testId).locator("input:not([type='hidden'])");
 
-  await spinbuttons.nth(0).fill(hours ?? "");
-  await spinbuttons.nth(1).fill(minutes ?? "");
+  await timeInputs.nth(0).fill(hours ?? "");
+  await timeInputs.nth(1).fill(minutes ?? "");
 }
 
 test("submits the day movements form successfully", async ({ page }) => {
