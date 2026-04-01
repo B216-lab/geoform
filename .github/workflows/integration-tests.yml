@@ -17,6 +17,9 @@ permissions:
   contents: read
   packages: read
 
+env:
+  GHCR_NAMESPACE: b216-lab
+
 jobs:
   integration:
     runs-on: ubuntu-latest
@@ -39,8 +42,8 @@ jobs:
       - name: Run integration test stack
         env:
           BACKEND_IMAGE_TAG: ${{ github.event.inputs.backend_image_tag || 'main' }}
-          BACKEND_IMAGE_REF: ghcr.io/${{ github.repository_owner }}/backend:${{ github.event.inputs.backend_image_tag || 'main' }}
-          BACKEND_BOOTSTRAP_IMAGE_REF: ghcr.io/${{ github.repository_owner }}/backend-bootstrap:${{ github.event.inputs.backend_image_tag || 'main' }}
+          BACKEND_IMAGE_REF: ghcr.io/${{ env.GHCR_NAMESPACE }}/backend:${{ github.event.inputs.backend_image_tag || 'main' }}
+          BACKEND_BOOTSTRAP_IMAGE_REF: ghcr.io/${{ env.GHCR_NAMESPACE }}/backend-bootstrap:${{ github.event.inputs.backend_image_tag || 'main' }}
         run: ./scripts/run-integration-test-ci.sh
 
       - name: Upload integration artifacts

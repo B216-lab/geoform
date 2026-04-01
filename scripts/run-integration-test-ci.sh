@@ -37,7 +37,7 @@ psql_query() {
 
 trap cleanup EXIT
 
-rm -rf "$ARTIFACTS_DIR"
+docker run --rm -v "$ROOT_DIR:/work" alpine:3.22 sh -lc 'rm -rf /work/.artifacts && mkdir -p /work/.artifacts/integration' >/dev/null
 mkdir -p "$ARTIFACTS_DIR"
 
 export BACKEND_IMAGE_REF

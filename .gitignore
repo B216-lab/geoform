@@ -9,3 +9,4 @@ public/env.js
 playwright-report
 test-results
 .artifacts
+.dmux/

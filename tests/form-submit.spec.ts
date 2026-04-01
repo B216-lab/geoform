@@ -17,6 +17,13 @@ test("submits the day movements form successfully", async ({ page }) => {
     localStorage.setItem("geoform_lang", "en");
   });
 
+  await page.route("**/v1/public/forms/movements/respondent-keys/validate**", async (route) => {
+    await route.fulfill({
+      status: 204,
+      body: "",
+    });
+  });
+
   await page.route("**/suggest/address**", async (route) => {
     const query = new URL(route.request().url()).searchParams.get("query") ?? "";
     const normalizedQuery = query.toLowerCase();
@@ -48,7 +55,7 @@ test("submits the day movements form successfully", async ({ page }) => {
     });
   });
 
-  await page.goto("/");
+  await page.goto("/?respondentKey=integration-test-respondent");
 
   await page.getByTestId("birthday-input").fill("1990-01-01");
 

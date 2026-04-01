@@ -1,7 +1,7 @@
 import { ApiHttpError, ApiNetworkError } from "../../lib/api.ts";
 import i18n from "../../lib/i18n.ts";
 import { getApiBaseUrl } from "../../lib/runtimeConfig.ts";
-import type { DayMovementsFormValues } from "./schema.ts";
+import type { DayMovementsSubmissionPayload } from "./schema.ts";
 
 const RESPONDENT_KEY_INVALID_STATUSES = new Set([400, 401, 403, 404, 422]);
 
@@ -62,7 +62,10 @@ export async function validateRespondentKey(respondentKey: string): Promise<bool
  * @throws ApiNetworkError on network failure
  * @throws ApiHttpError on non-2xx responses
  */
-export async function submitDayMovementsForm(data: DayMovementsFormValues, respondentKey: string): Promise<Response> {
+export async function submitDayMovementsForm(
+  data: DayMovementsSubmissionPayload,
+  respondentKey: string,
+): Promise<Response> {
   const endpoint = `${getApiBaseUrl()}/v1/public/forms/movements`;
   const payload = {
     ...data,

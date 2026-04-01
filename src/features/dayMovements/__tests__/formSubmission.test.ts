@@ -4,7 +4,7 @@ import {
   submitDayMovementsForm,
   validateRespondentKey,
 } from "../formSubmission.ts";
-import type { DayMovementsFormValues } from "../schema.ts";
+import { mapTimelineFormToPayload, type DayMovementsFormValues } from "../schema.ts";
 
 const validPayload: DayMovementsFormValues = {
   birthday: "1990-05-15",
@@ -93,7 +93,7 @@ describe("submitDayMovementsForm", () => {
       .spyOn(globalThis, "fetch")
       .mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 201 }));
 
-    await submitDayMovementsForm(validPayload, "abc-123");
+    await submitDayMovementsForm(mapTimelineFormToPayload(validPayload), "abc-123");
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [, requestInit] = fetchMock.mock.calls[0] ?? [];
