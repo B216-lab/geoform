@@ -4,3 +4,9 @@ dist
 node_modules
 docker-compose.yml
 public/env.js
+.ci/backend
+.ci/backend-src
+playwright-report
+test-results
+.artifacts
+.dmux/

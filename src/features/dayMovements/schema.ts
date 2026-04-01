@@ -185,6 +185,29 @@ export const dayMovementsSchema = () =>
 export type DayMovementsFormValues = z.infer<ReturnType<typeof dayMovementsSchema>>;
 export type MovementValues = z.infer<ReturnType<typeof movementSchema>>;
 
+export interface SubmissionAddressPayload {
+  value: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+export interface SubmissionMovementPayload
+  extends Omit<
+    MovementValues,
+    "departureAddress" | "arrivalAddress" | "waitBetweenTransfersMinutes" | "tripCost"
+  > {
+  departureAddress: SubmissionAddressPayload | null;
+  arrivalAddress: SubmissionAddressPayload | null;
+  waitBetweenTransfersMinutes: string;
+  tripCost: string;
+}
+
+export interface DayMovementsSubmissionPayload
+  extends Omit<DayMovementsFormValues, "homeAddress" | "movements"> {
+  homeAddress: SubmissionAddressPayload;
+  movements: SubmissionMovementPayload[];
+}
+
 export interface TimelineStartPoint {
   departureTime: string;
   departurePlace: string;
@@ -292,9 +315,61 @@ export function normalizeDraft(
 /**
  * Maps timeline-edited form data to payload with guaranteed movement chaining.
  */
-export function mapTimelineFormToPayload(data: DayMovementsFormValues): DayMovementsFormValues {
+function parseOptionalCoordinate(value: unknown): number | undefined {
+  if (typeof value !== "string" && typeof value !== "number") {
+    return undefined;
+  }
+
+  const parsed = Number.parseFloat(String(value));
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function mapAddressToPayload(
+  address: DaDataAddressValue | null | undefined,
+): SubmissionAddressPayload | null {
+  if (!address) {
+    return null;
+  }
+
+  const payload: SubmissionAddressPayload = {
+    value: address.value,
+  };
+
+  const latitude = parseOptionalCoordinate(address.data?.geo_lat);
+  const longitude = parseOptionalCoordinate(address.data?.geo_lon);
+
+  if (latitude !== undefined) {
+    payload.latitude = latitude;
+  }
+
+  if (longitude !== undefined) {
+    payload.longitude = longitude;
+  }
+
+  return payload;
+}
+
+export function mapTimelineFormToPayload(
+  data: DayMovementsFormValues,
+): DayMovementsSubmissionPayload {
+  const homeAddress = mapAddressToPayload(data.homeAddress);
+
+  if (!homeAddress) {
+    throw new Error("homeAddress is required");
+  }
+
   return {
     ...data,
-    movements: chainMovements(data.movements as MovementValues[]),
+    homeAddress,
+    movements: chainMovements(data.movements as MovementValues[]).map((movement) => ({
+      ...movement,
+      departureAddress: mapAddressToPayload(movement.departureAddress),
+      arrivalAddress: mapAddressToPayload(movement.arrivalAddress),
+      waitBetweenTransfersMinutes: String(movement.waitBetweenTransfersMinutes ?? ""),
+      tripCost:
+        movement.tripCost === null || movement.tripCost === undefined
+          ? ""
+          : String(movement.tripCost),
+    })),
   };
 }

@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:integration": "npx playwright test --config=playwright.config.ts",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "format": "biome format --write .",
@@ -38,6 +39,7 @@
     "@biomejs/biome": "^2.4.8",
     "@commitlint/cli": "^20.4.2",
     "@commitlint/config-conventional": "^20.4.2",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/vite": "^4.1.8",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -58,6 +60,6 @@
     "**/*.{js,jsx,ts,tsx,mjs,cjs,json}": [
       "biome check --write --no-errors-on-unmatched"
     ],
-    "Dockerfile": "bunx hadolint"
+    "Dockerfile*": "bash -lc 'for file in \"$@\"; do docker run --rm -i hadolint/hadolint < \"$file\"; done' --"
   }
 }

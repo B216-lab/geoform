@@ -1,0 +1,74 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: geoform_integration
+      POSTGRES_USER: geoform
+      POSTGRES_PASSWORD: geoform
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  bootstrap:
+    image: ${BACKEND_BOOTSTRAP_IMAGE_REF:-ghcr.io/b216-lab/backend-bootstrap:main}
+    environment:
+      DATABASE_URL: postgres://geoform:geoform@postgres:5432/geoform_integration?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend:
+    image: ${BACKEND_IMAGE_REF:-ghcr.io/b216-lab/backend:main}
+    environment:
+      SERVER_PORT: "8081"
+      DATABASE_URL: postgres://geoform:geoform@postgres:5432/geoform_integration?sslmode=disable
+      CORS_ALLOWED_ORIGINS: http://frontend:4173,http://127.0.0.1:4173,http://localhost:4173
+    depends_on:
+      bootstrap:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8081/healthz >/dev/null || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_DADATA_KEY: ${VITE_DADATA_KEY:-test}
+        VITE_DADATA_API: ${VITE_DADATA_API:-http://dadata.test/suggestions/api/4_1/rs/suggest/address}
+    environment:
+      API_BASE_URL: http://backend:8081
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:4173"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  playwright:
+    build:
+      context: .
+      dockerfile: Dockerfile.playwright
+    environment:
+      PLAYWRIGHT_APP_URL: http://frontend:4173
+      INTEGRATION_TEST_MARKER: ${INTEGRATION_TEST_MARKER:-integration-test-comment}
+    volumes:
+      - ./.artifacts/integration:/artifacts
+    command:
+      - npx
+      - playwright
+      - test
+      - tests/form-submit.spec.ts
+      - --config=playwright.config.ts
+      - --reporter=line
+      - --output=/artifacts/test-results
+    depends_on:
+      frontend:
+        condition: service_healthy

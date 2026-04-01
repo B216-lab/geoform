@@ -97,6 +97,7 @@ export function MovementsStep({
                         name="movements.0.departureTime"
                         render={({ field }) => (
                           <TimePicker
+                            data-testid="movement-0-departure-time"
                             label={t("form.time")}
                             withAsterisk
                             value={field.value ?? ""}
@@ -115,6 +116,7 @@ export function MovementsStep({
                         name="movements.0.departurePlace"
                         render={({ field }) => (
                           <Select
+                            data-testid="movement-0-departure-place"
                             label={t("form.point")}
                             withAsterisk
                             data={placeOptions}
@@ -132,6 +134,7 @@ export function MovementsStep({
                     name="movements.0.departureAddress"
                     render={({ field }) => (
                       <AddressAutocomplete
+                        testId="movement-0-departure-address"
                         value={field.value as DaDataAddressSuggestion | null}
                         onChange={field.onChange}
                         getAddressItems={getAddressItems}
