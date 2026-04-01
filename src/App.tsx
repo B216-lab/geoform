@@ -24,7 +24,7 @@ import {
 } from "./features/dayMovements/formSubmission.ts";
 import { ApiHttpError, ApiNetworkError } from "./lib/api.ts";
 
-type AccessStatus = "checking" | "ready" | "missing" | "invalid" | "error";
+type AccessStatus = "checking" | "ready" | "invalid" | "error";
 
 export default function App() {
   const { setColorScheme } = useMantineColorScheme();
@@ -46,7 +46,7 @@ export default function App() {
   const validateAccess = useCallback(async () => {
     const extractedKey = extractRespondentKeyFromUrl(window.location.href);
     if (!extractedKey) {
-      setAccessStatus("missing");
+      setAccessStatus("ready");
       setRespondentKey(null);
       setAccessError(null);
       return;
@@ -91,22 +91,8 @@ export default function App() {
       );
     }
 
-    if (accessStatus === "ready" && respondentKey) {
+    if (accessStatus === "ready") {
       return <DayMovementsForm respondentKey={respondentKey} />;
-    }
-
-    if (accessStatus === "missing") {
-      return (
-        <Alert
-          variant="light"
-          color="red"
-          icon={<IconAlertCircle size={16} />}
-          title={t("errors.respondentKeyMissingTitle")}
-          data-testid="respondent-key-missing-alert"
-        >
-          {t("errors.respondentKeyMissing")}
-        </Alert>
-      );
     }
 
     if (accessStatus === "invalid") {

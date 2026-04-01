@@ -64,13 +64,15 @@ export async function validateRespondentKey(respondentKey: string): Promise<bool
  */
 export async function submitDayMovementsForm(
   data: DayMovementsSubmissionPayload,
-  respondentKey: string,
+  respondentKey?: string | null,
 ): Promise<Response> {
   const endpoint = `${getApiBaseUrl()}/v1/public/forms/movements`;
-  const payload = {
-    ...data,
-    respondentKey,
-  };
+  const payload = respondentKey
+    ? {
+        ...data,
+        respondentKey,
+      }
+    : data;
 
   let response: Response;
   try {

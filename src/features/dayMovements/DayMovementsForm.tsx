@@ -82,7 +82,7 @@ const isStartPointReady = (movement: MovementValues | undefined): boolean => {
   return true;
 };
 
-export function DayMovementsForm({ respondentKey }: { respondentKey: string }) {
+export function DayMovementsForm({ respondentKey }: { respondentKey?: string | null }) {
   const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const genderOptions = enumToOptions(Gender, t, "enums.gender");

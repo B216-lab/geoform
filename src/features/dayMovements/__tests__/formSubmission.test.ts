@@ -4,7 +4,7 @@ import {
   submitDayMovementsForm,
   validateRespondentKey,
 } from "../formSubmission.ts";
-import { mapTimelineFormToPayload, type DayMovementsFormValues } from "../schema.ts";
+import { type DayMovementsFormValues, mapTimelineFormToPayload } from "../schema.ts";
 
 const validPayload: DayMovementsFormValues = {
   birthday: "1990-05-15",
@@ -100,5 +100,19 @@ describe("submitDayMovementsForm", () => {
     const body = requestInit?.body;
     expect(typeof body).toBe("string");
     expect(body).toContain('"respondentKey":"abc-123"');
+  });
+
+  it("omits respondent key from payload when not provided", async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 201 }));
+
+    await submitDayMovementsForm(mapTimelineFormToPayload(validPayload));
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [, requestInit] = fetchMock.mock.calls[0] ?? [];
+    const body = requestInit?.body;
+    expect(typeof body).toBe("string");
+    expect(body).not.toContain("respondentKey");
   });
 });
