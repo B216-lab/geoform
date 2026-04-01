@@ -87,6 +87,11 @@ src/
 - Indent: 2 spaces.
 - Line width: 100.
 - Double quotes, semicolons always.
+- Use Bun-based commands for local scripts and hooks; do not swap to `npm` /
+  `npx` unless Bun is unavailable and you explicitly need a fallback.
+- Prefer `bun run <script>` for package scripts. Do not use bare `bun test`
+  in this repo because tests run through Vitest, not Bun's native test
+  runner.
 - Run `bun run format` to auto-format; `bun run format:check` for CI.
 
 ### Linting (Biome)
@@ -118,8 +123,8 @@ These run automatically on every commit — do not skip them:
 
 | Hook         | What it does                                                   |
 | ------------ | -------------------------------------------------------------- |
-| `pre-commit` | Runs `lint-staged` → Biome check (`--write`) on staged `*.{js,jsx,ts,tsx,mjs,cjs,json}` files; hadolint on `Dockerfile` |
-| `commit-msg` | Runs `commitlint` to enforce conventional commit format        |
+| `pre-commit` | Runs `bun run lint-staged`, then `bun run test`                |
+| `commit-msg` | Runs `bun run commitlint --edit` to enforce conventional commit format |
 
 ### Before pushing
 

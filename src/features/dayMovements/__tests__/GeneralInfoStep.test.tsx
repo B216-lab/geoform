@@ -26,7 +26,7 @@ function Wrapper({ children }: { children: ReactNode }) {
   });
   return (
     <I18nextProvider i18n={i18n}>
-      <MantineProvider>
+      <MantineProvider env="test">
         <FormProvider {...methods}>{children}</FormProvider>
       </MantineProvider>
     </I18nextProvider>
