@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import i18n from "../../../lib/i18n.ts";
-import { type DayMovementsFormValues, dayMovementsSchema } from "../schema.ts";
+import {
+  dayMovementsSchema,
+  type DayMovementsFormValues,
+  mapTimelineFormToPayload,
+} from "../schema.ts";
 
 function validFormData(): DayMovementsFormValues {
   return {
@@ -169,5 +173,37 @@ describe("dayMovementsSchema", () => {
 
     const result = dayMovementsSchema().safeParse(data);
     expect(result.success).toBe(true);
+  });
+
+  it("maps addresses and numeric fields to backend payload shape", () => {
+    const payload = mapTimelineFormToPayload(validFormData());
+
+    expect(payload.homeAddress).toEqual({
+      value: "ул. Ленина, д. 1",
+      latitude: 52.2978,
+      longitude: 104.2964,
+    });
+
+    expect(payload.movements[0]).toMatchObject({
+      departureAddress: null,
+      arrivalAddress: {
+        value: "ул. Карла Маркса, д. 5",
+        latitude: 52.3,
+        longitude: 104.3,
+      },
+      waitBetweenTransfersMinutes: "0",
+      tripCost: "",
+    });
+
+    expect(payload.movements[1]).toMatchObject({
+      departureAddress: {
+        value: "ул. Карла Маркса, д. 5",
+        latitude: 52.3,
+        longitude: 104.3,
+      },
+      arrivalAddress: null,
+      waitBetweenTransfersMinutes: "0",
+      tripCost: "",
+    });
   });
 });

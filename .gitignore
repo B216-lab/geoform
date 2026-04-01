@@ -8,3 +8,4 @@ public/env.js
 .ci/backend-src
 playwright-report
 test-results
+.artifacts

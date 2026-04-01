@@ -62,10 +62,7 @@ export async function validateRespondentKey(respondentKey: string): Promise<bool
  * @throws ApiNetworkError on network failure
  * @throws ApiHttpError on non-2xx responses
  */
-export async function submitDayMovementsForm(
-  data: DayMovementsFormValues,
-  respondentKey: string,
-): Promise<Response> {
+export async function submitDayMovementsForm(data: DayMovementsFormValues, respondentKey: string): Promise<Response> {
   const endpoint = `${getApiBaseUrl()}/v1/public/forms/movements`;
   const payload = {
     ...data,
