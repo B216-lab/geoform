@@ -61,6 +61,13 @@ const isMovementLegReady = (movement: MovementValues | undefined): boolean => {
   ) {
     return false;
   }
+  if (!movement.arrivalTime || !movement.arrivalPlace) return false;
+  if (
+    movement.arrivalPlace !== "HOME_RESIDENCE" &&
+    !hasHouseNumber(movement.arrivalAddress as DaDataAddressSuggestion | null)
+  ) {
+    return false;
+  }
   if (
     movement.movementType === "TRANSPORT" &&
     (!movement.transport || movement.transport.length === 0)
@@ -142,10 +149,23 @@ export function DayMovementsForm({ respondentKey }: { respondentKey: string }) {
     for (let i = 1; i < chained.length; i++) {
       const nextMovement = chained[i];
       if (!nextMovement) continue;
+      const currDepartureTime = getValues(`movements.${i}.departureTime`);
       const currDeparturePlace = getValues(`movements.${i}.departurePlace`);
       const currDepartureAddress = getValues(`movements.${i}.departureAddress`);
+      const nextDepartureTime = nextMovement.departureTime ?? "";
       const nextDeparturePlace = nextMovement.departurePlace ?? "";
       const nextDepartureAddress = nextMovement.departureAddress ?? null;
+
+      if (currDepartureTime !== nextDepartureTime) {
+        setValue(`movements.${i}.departureTime`, nextDepartureTime, {
+          shouldDirty: false,
+          shouldTouch: false,
+          shouldValidate: false,
+        });
+        if (nextDepartureTime) {
+          clearErrors(`movements.${i}.departureTime`);
+        }
+      }
 
       if (currDeparturePlace !== nextDeparturePlace) {
         setValue(`movements.${i}.departurePlace`, nextDeparturePlace, {

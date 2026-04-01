@@ -157,6 +157,25 @@ export const movementSchema = () =>
           path: ["arrivalPlace"],
         });
       }
+
+      // Ensure arrivalTime is after departureTime within the same movement.
+      if (data.departureTime && data.arrivalTime) {
+        const depParts = data.departureTime.split(":").map(Number);
+        const arrParts = data.arrivalTime.split(":").map(Number);
+        const depH = depParts[0] ?? NaN;
+        const depM = depParts[1] ?? NaN;
+        const arrH = arrParts[0] ?? NaN;
+        const arrM = arrParts[1] ?? NaN;
+        const depMinutes = depH * 60 + depM;
+        const arrMinutes = arrH * 60 + arrM;
+        if (!Number.isNaN(depMinutes) && !Number.isNaN(arrMinutes) && arrMinutes <= depMinutes) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: i18n.t("validation.arrivalAfterDeparture"),
+            path: ["arrivalTime"],
+          });
+        }
+      }
     });
 
 /**
@@ -285,6 +304,7 @@ export function chainMovements(movements: MovementValues[] | undefined): Movemen
     const prev = next[i - 1];
     const current = next[i];
     if (!prev || !current) continue;
+    current.departureTime = prev.arrivalTime ?? "";
     current.departurePlace = prev.arrivalPlace ?? "";
     current.departureAddress = prev.arrivalAddress ?? null;
   }
@@ -367,7 +387,9 @@ export function mapTimelineFormToPayload(
       arrivalAddress: mapAddressToPayload(movement.arrivalAddress),
       waitBetweenTransfersMinutes: String(movement.waitBetweenTransfersMinutes ?? ""),
       tripCost:
-        movement.tripCost === null || movement.tripCost === undefined ? "" : String(movement.tripCost),
+        movement.tripCost === null || movement.tripCost === undefined
+          ? ""
+          : String(movement.tripCost),
     })),
   };
 }

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import i18n from "../../../lib/i18n.ts";
 import {
-  dayMovementsSchema,
   type DayMovementsFormValues,
+  dayMovementsSchema,
   mapTimelineFormToPayload,
 } from "../schema.ts";
 
@@ -137,6 +137,21 @@ describe("dayMovementsSchema", () => {
         i18n.t("validation.departureArrivalAddressMustDiffer"),
       );
     }
+  });
+
+  it.each([
+    ["08:00", "08:00", false],
+    ["08:00", "07:59", false],
+    ["08:00", "07:30", false],
+    ["08:00", "08:01", true],
+    ["08:00", "09:00", true],
+    ["23:59", "00:00", false],
+  ])("validates arrivalTime after departureTime: '%s' -> '%s' = valid=%s", (departure, arrival, expected) => {
+    const data = validFormData();
+    data.movements[0]!.departureTime = departure;
+    data.movements[0]!.arrivalTime = arrival;
+    const result = dayMovementsSchema().safeParse(data);
+    expect(result.success).toBe(expected);
   });
 
   it("allows HOME_RESIDENCE to non-home when addresses differ", () => {
