@@ -17,6 +17,8 @@ compose() {
 }
 
 collect_failure_artifacts() {
+  docker run --rm -v "$ROOT_DIR:/work" alpine:3.22 sh -lc \
+    'rm -rf /work/.artifacts && mkdir -p /work/.artifacts/integration && chmod -R 0777 /work/.artifacts' >/dev/null
   mkdir -p "$ARTIFACTS_DIR"
   compose logs --no-color >"$ARTIFACTS_DIR/compose.log" 2>&1 || true
   compose ps >"$ARTIFACTS_DIR/compose-ps.log" 2>&1 || true
@@ -37,7 +39,7 @@ psql_query() {
 
 trap cleanup EXIT
 
-rm -rf "$ARTIFACTS_DIR"
+docker run --rm -v "$ROOT_DIR:/work" alpine:3.22 sh -lc 'rm -rf /work/.artifacts && mkdir -p /work/.artifacts/integration' >/dev/null
 mkdir -p "$ARTIFACTS_DIR"
 
 export BACKEND_IMAGE_REF

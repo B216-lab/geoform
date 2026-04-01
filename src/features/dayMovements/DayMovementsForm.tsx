@@ -61,13 +61,6 @@ const isMovementLegReady = (movement: MovementValues | undefined): boolean => {
   ) {
     return false;
   }
-  if (!movement.arrivalTime || !movement.arrivalPlace) return false;
-  if (
-    movement.arrivalPlace !== "HOME_RESIDENCE" &&
-    !hasHouseNumber(movement.arrivalAddress as DaDataAddressSuggestion | null)
-  ) {
-    return false;
-  }
   if (
     movement.movementType === "TRANSPORT" &&
     (!movement.transport || movement.transport.length === 0)
