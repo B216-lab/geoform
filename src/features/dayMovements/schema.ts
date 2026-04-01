@@ -367,7 +367,9 @@ export function mapTimelineFormToPayload(
       arrivalAddress: mapAddressToPayload(movement.arrivalAddress),
       waitBetweenTransfersMinutes: String(movement.waitBetweenTransfersMinutes ?? ""),
       tripCost:
-        movement.tripCost === null || movement.tripCost === undefined ? "" : String(movement.tripCost),
+        movement.tripCost === null || movement.tripCost === undefined
+          ? ""
+          : String(movement.tripCost),
     })),
   };
 }

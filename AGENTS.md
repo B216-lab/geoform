@@ -123,7 +123,7 @@ These run automatically on every commit — do not skip them:
 
 | Hook         | What it does                                                   |
 | ------------ | -------------------------------------------------------------- |
-| `pre-commit` | Runs `bun run lint-staged`, then `bun run test`                |
+| `pre-commit` | Runs `bun run lint-staged`, `bun run format:check`, then `bun run test` |
 | `commit-msg` | Runs `bun run commitlint --edit` to enforce conventional commit format |
 
 ### Before pushing
