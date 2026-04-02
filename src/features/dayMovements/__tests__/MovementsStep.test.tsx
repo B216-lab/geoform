@@ -235,4 +235,89 @@ describe("MovementsStep", () => {
 
     expect(onAddMovement).toHaveBeenCalledTimes(1);
   });
+
+  it("renders editable departure time for movements after the first", () => {
+    render(
+      <Wrapper>
+        <MovementsStep
+          placeOptions={[{ value: "HOME_RESIDENCE", label: "Home" }]}
+          timeline={makeTimeline({
+            fields: [{ id: "field-1" }, { id: "field-2" }] as MovementsStepTimeline["fields"],
+            isFirstDepartureReady: true,
+            movements: [
+              {
+                movementType: "ON_FOOT",
+                transport: [],
+                waitBetweenTransfersMinutes: 0,
+                departureTime: "08:00",
+                departurePlace: "HOME_RESIDENCE",
+                departureAddress: null,
+                arrivalTime: "08:30",
+                arrivalPlace: "WORKPLACE",
+                arrivalAddress: {
+                  value: "ул. Карла Маркса, д. 5",
+                  data: { house: "5" },
+                },
+                comment: "",
+              },
+              {
+                movementType: "ON_FOOT",
+                transport: [],
+                waitBetweenTransfersMinutes: 0,
+                departureTime: "09:00",
+                departurePlace: "WORKPLACE",
+                departureAddress: {
+                  value: "ул. Карла Маркса, д. 5",
+                  data: { house: "5" },
+                },
+                arrivalTime: "",
+                arrivalPlace: "",
+                arrivalAddress: null,
+                comment: "",
+              },
+            ],
+            chainedMovements: [
+              {
+                movementType: "ON_FOOT",
+                transport: [],
+                waitBetweenTransfersMinutes: 0,
+                departureTime: "08:00",
+                departurePlace: "HOME_RESIDENCE",
+                departureAddress: null,
+                arrivalTime: "08:30",
+                arrivalPlace: "WORKPLACE",
+                arrivalAddress: {
+                  value: "ул. Карла Маркса, д. 5",
+                  data: { house: "5" },
+                },
+                comment: "",
+              },
+              {
+                movementType: "ON_FOOT",
+                transport: [],
+                waitBetweenTransfersMinutes: 0,
+                departureTime: "09:00",
+                departurePlace: "WORKPLACE",
+                departureAddress: {
+                  value: "ул. Карла Маркса, д. 5",
+                  data: { house: "5" },
+                },
+                arrivalTime: "",
+                arrivalPlace: "",
+                arrivalAddress: null,
+                comment: "",
+              },
+            ],
+          })}
+          addressConfig={makeAddressConfig()}
+          actions={makeActions({
+            isMovementLegReady: (movement) => Boolean(movement?.arrivalPlace),
+          })}
+          status={makeStatus()}
+        />
+      </Wrapper>,
+    );
+
+    expect(screen.getByTestId("movement-1-departure-time")).toBeInTheDocument();
+  });
 });

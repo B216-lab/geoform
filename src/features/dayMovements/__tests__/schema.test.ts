@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import i18n from "../../../lib/i18n.ts";
 import {
+  buildNextMovementFromPrevious,
+  chainMovements,
   type DayMovementsFormValues,
   dayMovementsSchema,
   mapTimelineFormToPayload,
@@ -220,5 +222,22 @@ describe("dayMovementsSchema", () => {
       waitBetweenTransfersMinutes: "0",
       tripCost: "",
     });
+  });
+
+  it("does not overwrite later departure time when chaining movements", () => {
+    const data = validFormData();
+    data.movements[1]!.departureTime = "18:10";
+
+    const chained = chainMovements(data.movements);
+
+    expect(chained[1]?.departureTime).toBe("18:10");
+    expect(chained[1]?.departurePlace).toBe("WORKPLACE");
+  });
+
+  it("creates next movement with linked departure place but empty departure time", () => {
+    const nextMovement = buildNextMovementFromPrevious(validFormData().movements[0]!);
+
+    expect(nextMovement.departureTime).toBe("");
+    expect(nextMovement.departurePlace).toBe("WORKPLACE");
   });
 });

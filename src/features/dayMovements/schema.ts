@@ -284,7 +284,7 @@ export function getTimelineStartPoint(movements: MovementValues[] | undefined): 
 export function buildNextMovementFromPrevious(previous: MovementValues): MovementValues {
   return {
     ...(defaultMovement as MovementValues),
-    departureTime: previous.arrivalTime ?? "",
+    departureTime: "",
     departurePlace: previous.arrivalPlace ?? "",
     departureAddress: previous.arrivalAddress ?? null,
   };
@@ -292,7 +292,7 @@ export function buildNextMovementFromPrevious(previous: MovementValues): Movemen
 
 /**
  * Ensures departure fields are linearly chained:
- * movement[i].departure = movement[i - 1].arrival for i > 0.
+ * movement[i].departure place/address = movement[i - 1].arrival for i > 0.
  */
 export function chainMovements(movements: MovementValues[] | undefined): MovementValues[] {
   if (!movements || movements.length === 0) {
@@ -304,7 +304,6 @@ export function chainMovements(movements: MovementValues[] | undefined): Movemen
     const prev = next[i - 1];
     const current = next[i];
     if (!prev || !current) continue;
-    current.departureTime = prev.arrivalTime ?? "";
     current.departurePlace = prev.arrivalPlace ?? "";
     current.departureAddress = prev.arrivalAddress ?? null;
   }
