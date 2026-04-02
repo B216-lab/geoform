@@ -94,7 +94,7 @@ export function ArrivalPointItem({
               render={({ field }) => (
                 <TimePicker
                   data-testid={`movement-${index}-arrival-time`}
-                  label={t("form.time")}
+                  label={t("form.arrivalTime")}
                   withAsterisk
                   value={field.value ?? ""}
                   onChange={field.onChange}

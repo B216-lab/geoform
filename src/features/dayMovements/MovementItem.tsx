@@ -79,24 +79,29 @@ export function MovementItem({
             {t("movement.from")}
           </Text>
           {index > 0 && (
-            <Controller
-              control={control}
-              name={`${prefix}.departureTime`}
-              render={({ field }) => (
-                <TimePicker
-                  data-testid={`movement-${index}-departure-time`}
-                  label={t("form.time")}
-                  withAsterisk
-                  value={field.value ?? ""}
-                  onChange={field.onChange}
-                  format="24h"
-                  withSeconds={false}
-                  leftSection={<IconClockHour3 size={16} />}
-                  error={toError(movementErrors?.departureTime?.message)}
-                  disabled={disabled}
-                />
-              )}
-            />
+            <>
+              <Text size="sm" c="dimmed">
+                {t("movement.departureFromPoint")}
+              </Text>
+              <Controller
+                control={control}
+                name={`${prefix}.departureTime`}
+                render={({ field }) => (
+                  <TimePicker
+                    data-testid={`movement-${index}-departure-time`}
+                    label={t("form.departureTime")}
+                    withAsterisk
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    format="24h"
+                    withSeconds={false}
+                    leftSection={<IconClockHour3 size={16} />}
+                    error={toError(movementErrors?.departureTime?.message)}
+                    disabled={disabled}
+                  />
+                )}
+              />
+            </>
           )}
           <Text size="sm" fw={500}>
             {previousPlaceLabel}

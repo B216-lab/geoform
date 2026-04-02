@@ -39,6 +39,8 @@ const ruCommon = {
     movementsDate: "Дата передвижений",
     movementsDateDescription: "Нужно будет описать передвижения за этот день",
     departure: "Отправление",
+    departureTime: "Время отправления",
+    arrivalTime: "Время прибытия",
     time: "Время",
     point: "Пункт",
     address: "Адрес",
@@ -49,6 +51,7 @@ const ruCommon = {
   movement: {
     title: "Передвижение {{index}}",
     from: "Откуда",
+    departureFromPoint: "Время отправления из этой точки",
     onFoot: "Пешком",
     transport: "Транспорт",
     transportType: "Тип транспорта",

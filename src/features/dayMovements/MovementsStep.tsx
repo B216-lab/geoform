@@ -98,7 +98,7 @@ export function MovementsStep({
                         render={({ field }) => (
                           <TimePicker
                             data-testid="movement-0-departure-time"
-                            label={t("form.time")}
+                            label={t("form.departureTime")}
                             withAsterisk
                             value={field.value ?? ""}
                             onChange={field.onChange}

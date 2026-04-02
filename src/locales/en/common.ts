@@ -39,6 +39,8 @@ const enCommon = {
     movementsDate: "Movement date",
     movementsDateDescription: "You will need to describe your movements for this day",
     departure: "Departure",
+    departureTime: "Departure time",
+    arrivalTime: "Arrival time",
     time: "Time",
     point: "Point",
     address: "Address",
@@ -49,6 +51,7 @@ const enCommon = {
   movement: {
     title: "Movement {{index}}",
     from: "From",
+    departureFromPoint: "Departure from this point",
     onFoot: "On foot",
     transport: "Transport",
     transportType: "Transport type",
